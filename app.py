@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS (Only for Background + White Card)
+# Background & Custom CSS (Only for Background + Cards)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -103,11 +103,22 @@ with st.form("diabetes_form"):
         heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
     st.subheader("Health Metrics")
+
+    # ✅ HbA1c Title + Caption in One Row
+    col_hba1c1, col_hba1c2 = st.columns([1, 2.5])
+    with col_hba1c1:
+        st.markdown("**HbA1c Level (%) ***")
+    with col_hba1c2:
+        st.caption("Reflects average blood sugar over past 2-3 months. ≥6.5% is diabetic.")
+
+    hba1c_level = st.slider("", 3.0, 15.0, 5.5, 0.1)  # Empty label since we used custom title
+
+    # ✅ Other Sliders
     bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
     blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
-    st.caption("* HbA1c reflects average blood sugar over the past 2-3 months. ≥6.5% is considered diabetic.")
 
+    # ✅ Padding Above Button
+    st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True)
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
