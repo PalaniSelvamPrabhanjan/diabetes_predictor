@@ -30,7 +30,7 @@ def set_background(image_path):
         .block-container {{
             background-color: rgba(255,255,255,0.97);
             padding: 2rem 3rem;
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             max-width: 800px;
             margin: 2rem auto;
@@ -39,15 +39,15 @@ def set_background(image_path):
             color: black !important;
         }}
         .stButton>button {{
-            background: #2563eb;
-            color: white;
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-weight: bold;
+            background: #2563eb !important;
+            color: white !important;
+            border-radius: 8px !important;
+            padding: 0.6rem 1rem !important;
+            font-weight: bold !important;
         }}
         .stButton>button:hover {{
-            background: #1d4ed8;
-            color: white;
+            background: #1d4ed8 !important;
+            color: white !important;
         }}
         </style>
         """,
@@ -57,7 +57,7 @@ def set_background(image_path):
 set_background("backgroundimage.jpg")
 
 # -----------------------------
-# Loading GIF Encoder
+# Encode Loading GIF
 # -----------------------------
 def get_gif_base64(gif_path):
     with open(gif_path, "rb") as gif:
@@ -86,16 +86,12 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Session State for Modal & Loading
+# Session State for Loading and Result
 # -----------------------------
-if "show_modal" not in st.session_state:
-    st.session_state.show_modal = False
-if "result_text" not in st.session_state:
-    st.session_state.result_text = ""
-if "result_color" not in st.session_state:
-    st.session_state.result_color = "black"
 if "loading" not in st.session_state:
     st.session_state.loading = False
+if "result" not in st.session_state:
+    st.session_state.result = None
 
 # -----------------------------
 # Input Form
@@ -125,33 +121,27 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic
+# Prediction Logic with Loading GIF
 # -----------------------------
 if submitted:
     st.session_state.loading = True
-    st.rerun()
+    st.session_state.result = None
+    st.experimental_rerun()
 
 if st.session_state.loading:
-    # Show Loading Overlay
+    # Show Centered Loading GIF
     st.markdown(
         f"""
-        <div style="
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(255,255,255,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        ">
-            <img src="data:image/gif;base64,{loading_gif}" width="150">
+        <div style="text-align:center; margin-top: 30px;">
+            <img src="data:image/gif;base64,{loading_gif}" width="120">
+            <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
         </div>
         """,
         unsafe_allow_html=True
     )
-    # Simulate Prediction Delay
-    time.sleep(2)
+
+    # Simulate processing delay
+    time.sleep(1.5)
 
     # Run Prediction
     model = load_model()
@@ -162,27 +152,46 @@ if st.session_state.loading:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    st.session_state.result_text = (
-        "✅ No Diabetes Risk Detected." if prediction == 0
-        else "⚠️ Possible Diabetes Risk Detected. Please consult a medical professional."
-    )
-    st.session_state.result_color = "green" if prediction == 0 else "red"
-    st.session_state.show_modal = True
+    st.session_state.result = prediction
     st.session_state.loading = False
-    st.rerun()
+    st.experimental_rerun()
 
 # -----------------------------
-# Modal for Results
+# Show Result in a Clean Card
 # -----------------------------
-if st.session_state.show_modal:
-    st.markdown("---")
-    with st.container():
+if st.session_state.result is not None:
+    if st.session_state.result == 0:
         st.markdown(
-            f"<h3 style='text-align:center; color:{st.session_state.result_color};'>{st.session_state.result_text}</h3>",
+            """
+            <div style="
+                background-color: #ecfdf5;
+                border: 1px solid #34d399;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                text-align: center;
+                margin-top: 1rem;
+            ">
+                <h3 style="color: #065f46; margin: 0;">✅ No Diabetes Risk Detected.</h3>
+            </div>
+            """,
             unsafe_allow_html=True
         )
-        if st.button("Close", key="close_modal"):
-            st.session_state.show_modal = False
+    else:
+        st.markdown(
+            """
+            <div style="
+                background-color: #fef2f2;
+                border: 1px solid #f87171;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                text-align: center;
+                margin-top: 1rem;
+            ">
+                <h3 style="color: #991b1b; margin: 0;">⚠️ Possible Diabetes Risk Detected. Please consult a medical professional.</h3>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 # -----------------------------
 # Footer
