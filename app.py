@@ -14,45 +14,47 @@ st.set_page_config(
 # -----------------------------
 # Background Image
 # -----------------------------
-def add_bg_from_local(image_file):
-    with open(image_file, "rb") as img:
-        encoded_string = base64.b64encode(img.read()).decode()
+def set_background(image_path):
+    with open(image_path, "rb") as img:
+        encoded = base64.b64encode(img.read()).decode()
     st.markdown(
         f"""
         <style>
         .stApp {{
-            background-image: url(data:image/png;base64,{encoded_string});
+            background-image: url(data:image/png;base64,{encoded});
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
         }}
-        .card-container {{
-            background-color: #ffffff; /* solid white */
-            padding: 1.8rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .main-container {{
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 14px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 800px;
             margin: auto;
-            max-width: 700px;
+            color: black; /* All text inside card is black */
         }}
         .section-title {{
             font-size: 20px;
             font-weight: bold;
-            color: #2563eb;
-            margin-top: 10px;
-            margin-bottom: 5px;
+            color: black; /* Section titles are black */
+            margin-top: 1rem;
+        }}
+        .stMarkdown, .stText, label, p, h1, h2, h3, h4, h5, h6 {{
+            color: black !important; /* Override default Streamlit colors */
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
 
-add_bg_from_local("backgroundimage.jpg")
+set_background("backgroundimage.jpg")
 
 # -----------------------------
 # Loading Overlay
 # -----------------------------
 loading_gif = base64.b64encode(open("loadingPage.gif", "rb").read()).decode()
-
 st.markdown(f"""
 <style>
 #loading-overlay {{
@@ -75,7 +77,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Helper Functions
+# Load Model
 # -----------------------------
 @st.cache_resource
 def load_model():
@@ -89,16 +91,13 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
     return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
 
 # -----------------------------
-# Title and Description
+# Main Page
 # -----------------------------
-st.markdown("<h1 style='text-align:center; color:#1e3a8a;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b style='color:red;'>This is not medical advice.</b></p>", unsafe_allow_html=True)
-st.markdown("---")
+st.markdown("<div class='main-container'>", unsafe_allow_html=True)
 
-# -----------------------------
-# Form with Card Layout
-# -----------------------------
-st.markdown("<div class='card-container'>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+st.markdown("---")
 
 with st.form("diabetes_form"):
     st.markdown("<div class='section-title'>Demographics</div>", unsafe_allow_html=True)
@@ -106,7 +105,7 @@ with st.form("diabetes_form"):
     with col1:
         gender = st.selectbox("Gender", ["male", "female"])
     with col2:
-        age = st.slider("Age", min_value=0, max_value=120, value=30, step=1)
+        age = st.slider("Age", 0, 120, 30, 1)
 
     st.markdown("<div class='section-title'>Medical History</div>", unsafe_allow_html=True)
     col3, col4 = st.columns(2)
@@ -117,20 +116,19 @@ with st.form("diabetes_form"):
         heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
     st.markdown("<div class='section-title'>Health Metrics</div>", unsafe_allow_html=True)
-    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1, format="%.1f")
+    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
     blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1, format="%.1f")
-    st.caption("* HbA1c reflects average blood sugar over the past 2-3 months. A level ≥6.5% is diabetic.")
+    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+    st.caption("* HbA1c reflects average blood sugar over the past 2-3 months. ≥6.5% is considered diabetic.")
 
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Prediction and Result
+# Result
 # -----------------------------
 if submitted:
-    # Show loading overlay
     st.markdown("""
         <script>
         var overlay = parent.document.querySelector('#loading-overlay');
@@ -146,7 +144,6 @@ if submitted:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    # Hide loading overlay
     st.markdown("""
         <script>
         var overlay = parent.document.querySelector('#loading-overlay');
@@ -155,24 +152,12 @@ if submitted:
     """, unsafe_allow_html=True)
 
     if prediction == 0:
-        st.markdown(
-            """
-            <div style="background:#d1fae5; padding:1rem; border-radius:10px; border:2px solid #10b981;">
-            <h3 style="color:#065f46; text-align:center;">No Diabetes Risk Detected</h3>
-            <p style="text-align:center;">Your indicators do not suggest diabetes risk.</p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.success("No Diabetes Risk Detected.")
     else:
-        st.markdown(
-            """
-            <div style="background:#fee2e2; padding:1rem; border-radius:10px; border:2px solid #b91c1c;">
-            <h3 style="color:#7f1d1d; text-align:center;">Possible Diabetes Risk Detected</h3>
-            <p style="text-align:center;">Consult a healthcare professional for further evaluation.</p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.error("Possible Diabetes Risk Detected. Please consult a medical professional.")
 
 # -----------------------------
 # Footer
 # -----------------------------
 st.markdown("---")
-st.markdown("<small>This tool is for educational use only. Always seek professional medical advice.</small>", unsafe_allow_html=True)
+st.markdown("<small>This tool is for educational use only. Always consult a medical professional.</small>", unsafe_allow_html=True)
