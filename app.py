@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS
+# Background & Custom CSS (Only for Background + White Card)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -37,16 +37,24 @@ def set_background(image_path):
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
         }}
-        .stButton>button {{
-            background: #2563eb;
-            color: white !important;  /* ✅ White text */
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            font-weight: bold;
+        /* ✅ Result Card */
+        .result-box {{
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
         }}
-        .stButton>button:hover {{
-            background: #1d4ed8;
-            color: white !important;  /* ✅ Keeps white text on hover */
+        .green-box {{
+            background-color: #e6f9ed;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }}
+        .red-box {{
+            background-color: #fde8e8;
+            color: #991b1b;
+            border: 1px solid #f87171;
         }}
         </style>
         """,
@@ -103,7 +111,7 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic (With Spinner)
+# Prediction Logic
 # -----------------------------
 if submitted:
     with st.spinner("🔄 Checking your diabetes risk..."):
@@ -115,15 +123,25 @@ if submitted:
                                 smoking_val, bmi, hba1c_level, blood_glucose]])
         prediction = model.predict(input_data)[0]
 
-    result_text = (
-        "✅ No Diabetes Risk Detected." if prediction == 0
-        else "⚠️ Possible Diabetes Risk Detected. Please consult a medical professional."
-    )
-    result_color = "green" if prediction == 0 else "red"
+    if prediction == 0:
+        result_icon = "✅"
+        result_text = "No Diabetes Risk Detected"
+        explanation = "No signs of diabetes were detected based on the provided information."
+        box_class = "green-box"
+    else:
+        result_icon = "⚠️"
+        result_text = "Possible Diabetes Risk Detected"
+        explanation = "Your results suggest a potential risk. Please consult a medical professional."
+        box_class = "red-box"
 
     st.markdown("---")
     st.markdown(
-        f"<h3 style='text-align:center; color:{result_color};'>{result_text}</h3>",
+        f"""
+        <div class="result-box {box_class}">
+            {result_icon} <strong>{result_text}</strong><br>
+            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
