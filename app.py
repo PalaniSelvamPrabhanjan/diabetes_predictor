@@ -26,12 +26,20 @@ def add_bg_from_local(image_file):
             background-position: center;
             background-attachment: fixed;
         }}
-        .card {{
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 1.5rem;
+        .card-container {{
+            background-color: #ffffff; /* solid white */
+            padding: 1.8rem;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-top: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: auto;
+            max-width: 700px;
+        }}
+        .section-title {{
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-top: 10px;
+            margin-bottom: 5px;
         }}
         </style>
         """,
@@ -61,7 +69,6 @@ st.markdown(f"""
     visibility: hidden;
 }}
 </style>
-
 <div id="loading-overlay">
     <img src="data:image/gif;base64,{loading_gif}" width="180">
 </div>
@@ -84,24 +91,24 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
 # -----------------------------
 # Title and Description
 # -----------------------------
-st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center; color:#1e3a8a;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b style='color:red;'>This is not medical advice.</b></p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # -----------------------------
-# Input Form
+# Form with Card Layout
 # -----------------------------
-with st.form("diabetes_form"):
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("<div class='card-container'>", unsafe_allow_html=True)
 
-    st.subheader("Demographics")
+with st.form("diabetes_form"):
+    st.markdown("<div class='section-title'>Demographics</div>", unsafe_allow_html=True)
     col1, col2 = st.columns(2)
     with col1:
         gender = st.selectbox("Gender", ["male", "female"])
     with col2:
-        age = st.number_input("Age", min_value=0, max_value=120, value=30, step=1)
+        age = st.slider("Age", min_value=0, max_value=120, value=30, step=1)
 
-    st.subheader("Medical History")
+    st.markdown("<div class='section-title'>Medical History</div>", unsafe_allow_html=True)
     col3, col4 = st.columns(2)
     with col3:
         hypertension = st.selectbox("Hypertension", ["negative", "positive"])
@@ -109,17 +116,18 @@ with st.form("diabetes_form"):
     with col4:
         heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-    st.subheader("Health Metrics")
+    st.markdown("<div class='section-title'>Health Metrics</div>", unsafe_allow_html=True)
     bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1, format="%.1f")
     blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
     hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1, format="%.1f")
     st.caption("* HbA1c reflects average blood sugar over the past 2-3 months. A level ≥6.5% is diabetic.")
 
-    st.markdown("</div>", unsafe_allow_html=True)
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
+st.markdown("</div>", unsafe_allow_html=True)
+
 # -----------------------------
-# Prediction and Result Modal
+# Prediction and Result
 # -----------------------------
 if submitted:
     # Show loading overlay
@@ -146,7 +154,6 @@ if submitted:
         </script>
     """, unsafe_allow_html=True)
 
-    # Result Card
     if prediction == 0:
         st.markdown(
             """
