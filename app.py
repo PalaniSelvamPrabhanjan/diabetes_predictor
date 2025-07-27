@@ -33,7 +33,7 @@ def add_background(image_file):
         unsafe_allow_html=True
     )
 
-add_background("backgroundimage.jpg")
+add_background("backgroundImg.jpg")
 
 def slider_color(value, healthy, warning):
     if healthy[0] <= value <= healthy[1]:
