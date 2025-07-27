@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 
 # -----------------------------
-# Page configuration
+# Page Configuration
 # -----------------------------
 st.set_page_config(
     page_title="Diabetes Risk Predictor",
@@ -12,20 +12,61 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Animated Gradient Background & Metric Box Styling
+# Custom CSS (Background + Cards)
 # -----------------------------
 st.markdown("""
 <style>
+/* Full-page background image */
 .stApp {
-    background: linear-gradient(270deg, #74ebd5, #ACB6E5, #fbc2eb, #a6c1ee);
-    background-size: 800% 800%;
-    animation: gradientAnimation 15s ease infinite;
+    background: url("backgroundimage.jpg");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
-@keyframes gradientAnimation {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
+
+/* Card-like white container */
+.reportview-container .main .block-container {
+    padding: 2rem 2rem 2rem 2rem;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: auto;
 }
+
+/* Titles */
+h1, h2, h3 {
+    color: #2563eb; /* Blue tone */
+    font-weight: bold;
+}
+
+/* Subheaders */
+.subheader {
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* Warning, success, error boxes */
+div.stAlert {
+    border-radius: 8px;
+}
+
+/* Button styling */
+.stButton>button {
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.2rem;
+    font-weight: bold;
+    font-size: 1rem;
+}
+.stButton>button:hover {
+    opacity: 0.9;
+}
+
+/* Metric boxes */
 .metric-container {
     background-color: rgba(255,255,255,0.9);
     padding: 0.8rem;
@@ -40,137 +81,88 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Helper functions for dynamic slider color
-# -----------------------------
-def set_slider_color(value, healthy_range, warning_range):
-    if healthy_range[0] <= value <= healthy_range[1]:
-        return "#22c55e"  # green
-    elif warning_range[0] <= value <= warning_range[1]:
-        return "#f59e0b"  # orange
-    else:
-        return "#ef4444"  # red
-
-def apply_slider_style(index, color):
-    st.markdown(f"""
-        <style>
-        div.row-widget.stSlider:nth-of-type({index}) [data-baseweb="slider"] > div > div {{
-            background: linear-gradient(to right, {color} 0%, {color} 100%) !important;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
-
-# -----------------------------
-# Load trained model
+# Load the Trained Model
 # -----------------------------
 @st.cache_resource
 def load_model():
     try:
-        return joblib.load('HGBCmodel.pkl')
+        return joblib.load("HGBCmodel.pkl")
     except FileNotFoundError:
-        st.error("Model file 'HGBCmodel.pkl' not found. Ensure it is in the same folder as this script.")
+        st.error("Model file 'HGBCmodel.pkl' not found. Make sure it is in the same folder as this script.")
         st.stop()
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         st.stop()
 
 # -----------------------------
-# Encode categorical features
+# Encode Features
 # -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
-    gender_val = 1 if gender == "male" else 0
-    hypertension_val = 1 if hypertension == "positive" else 0
-    heart_disease_val = 1 if heart_disease == "positive" else 0
+    gender_val = 1 if gender == "Male" else 0
+    hypertension_val = 1 if hypertension == "Positive" else 0
+    heart_disease_val = 1 if heart_disease == "Positive" else 0
     smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
     smoking_val = smoking_map[smoking_history]
     return gender_val, hypertension_val, heart_disease_val, smoking_val
 
 # -----------------------------
-# Page Title
+# Title & Disclaimer
 # -----------------------------
 st.title("Diabetes Risk Predictor")
 st.markdown("""
-Enter your health details to estimate your risk of diabetes.  
-This is an educational tool and does not replace professional medical advice.
-""")
+This tool uses machine learning to estimate your diabetes risk based on health indicators.  
+<span style="color:red; font-weight:bold;">⚠ This is not a medical diagnosis. Always consult a healthcare professional.</span>
+""", unsafe_allow_html=True)
 st.markdown("---")
 
 # -----------------------------
-# Input Form
+# Input Form (Card Layout)
 # -----------------------------
 with st.form("diabetes_prediction_form"):
-    st.subheader("Your Health Details")
+    st.subheader("❤️ Health Assessment Form")
+    st.markdown("Please provide accurate information for better prediction accuracy.")
 
+    st.markdown("### DEMOGRAPHICS")
     col1, col2 = st.columns(2)
 
     with col1:
-        gender = st.selectbox("Gender", ["male", "female"], index=0)
-        hypertension = st.selectbox("Hypertension", ["negative", "positive"], index=0)
-        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"], index=0)
-        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"], index=0)
-
+        gender = st.selectbox("Gender *", ["Male", "Female"])
     with col2:
         age = st.number_input("Age", min_value=0, max_value=120, value=30, step=1)
 
-        # --- BMI ---
-        bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1, format="%.1f")
-        bmi_color = set_slider_color(bmi, healthy_range=(18.5, 24.9), warning_range=(25, 29.9))
-        apply_slider_style(1, bmi_color)
-        if bmi < 18.5:
-            st.markdown('<div class="metric-container warning">Underweight</div>', unsafe_allow_html=True)
-        elif 18.5 <= bmi <= 24.9:
-            st.markdown('<div class="metric-container healthy">Normal weight</div>', unsafe_allow_html=True)
-        elif 25 <= bmi <= 29.9:
-            st.markdown('<div class="metric-container warning">Overweight</div>', unsafe_allow_html=True)
-        elif 30 <= bmi <= 34.9:
-            st.markdown('<div class="metric-container danger">Obesity (Class 1)</div>', unsafe_allow_html=True)
-        elif 35 <= bmi <= 39.9:
-            st.markdown('<div class="metric-container danger">Obesity (Class 2)</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="metric-container danger">Obesity (Class 3, Severe)</div>', unsafe_allow_html=True)
+    st.markdown("### MEDICAL HISTORY")
+    col3, col4 = st.columns(2)
+    with col3:
+        hypertension = st.selectbox("Hypertension *", ["Negative", "Positive"])
+    with col4:
+        heart_disease = st.selectbox("Heart Disease *", ["Negative", "Positive"])
 
-        # --- Blood Glucose ---
-        blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-        glucose_color = set_slider_color(blood_glucose, healthy_range=(0, 100), warning_range=(101, 125))
-        apply_slider_style(2, glucose_color)
-        if blood_glucose <= 100:
-            st.markdown('<div class="metric-container healthy">Normal (≤100 mg/dL)</div>', unsafe_allow_html=True)
-        elif 101 <= blood_glucose <= 125:
-            st.markdown('<div class="metric-container warning">Pre-diabetes (101–125 mg/dL)</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="metric-container danger">Diabetic range (≥126 mg/dL)</div>', unsafe_allow_html=True)
+    smoking_history = st.selectbox("Smoking History *", ["No Info", "Current", "Never", "Past"])
 
-        # --- HbA1c ---
-        hba1c_level = st.slider("HbA1c Level (%)", 3.0, 15.0, 5.5, 0.1, format="%.1f")
-        hba1c_color = set_slider_color(hba1c_level, healthy_range=(0, 5.6), warning_range=(5.7, 6.4))
-        apply_slider_style(3, hba1c_color)
-        if hba1c_level < 5.7:
-            st.markdown('<div class="metric-container healthy">Normal (<5.7%)</div>', unsafe_allow_html=True)
-        elif 5.7 <= hba1c_level <= 6.4:
-            st.markdown('<div class="metric-container warning">Pre-diabetes (5.7–6.4%)</div>', unsafe_allow_html=True)
-        else:
-            st.markdown('<div class="metric-container danger">Diabetes (≥6.5%)</div>', unsafe_allow_html=True)
+    st.markdown("### HEALTH METRICS")
+    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1, format="%.1f")
+    blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+    hba1c_level = st.slider("HbA1c Level (%)", 3.0, 15.0, 5.5, 0.1, format="%.1f")
 
-    submitted = st.form_submit_button("Check Risk", use_container_width=True)
+    submitted = st.form_submit_button("Check Diabetes Risk")
 
-    # -----------------------------
-    # Prediction
-    # -----------------------------
     if submitted:
         model = load_model()
         gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
             gender, hypertension, heart_disease, smoking_history
         )
+
         input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
                                 smoking_val, bmi, hba1c_level, blood_glucose]])
 
         try:
             prediction = model.predict(input_data)[0]
             st.markdown("---")
-            st.subheader("Prediction")
             if prediction == 0:
-                st.success("No signs of diabetes detected.")
+                st.success("✅ No signs of diabetes detected.")
             else:
-                st.warning("Possible risk of diabetes detected. Consult a healthcare professional for further evaluation.")
+                st.error("❌ Possible Diabetes Risk Detected")
+                st.warning("Possible signs of diabetes detected. Consult a healthcare professional for proper evaluation.")
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
 
@@ -179,8 +171,9 @@ with st.form("diabetes_prediction_form"):
 # -----------------------------
 st.markdown("---")
 st.markdown("""
-<small>
+<div style="background-color:#fff3cd; padding:10px; border-radius:5px;">
+<b>⚠ Medical Disclaimer</b><br>
 This tool is for educational purposes only and should not replace professional medical advice.  
-Always consult a qualified healthcare professional for any medical concerns.
-</small>
+Always consult with a healthcare provider for accurate diagnosis and treatment.
+</div>
 """, unsafe_allow_html=True)
