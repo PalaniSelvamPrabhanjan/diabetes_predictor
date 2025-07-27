@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background Image
+# Background Image & Styles
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -82,7 +82,7 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Input Form Inside White Card
+# Input Form (inside white card)
 # -----------------------------
 with st.container():
     st.markdown("<div class='main-card'>", unsafe_allow_html=True)
@@ -114,7 +114,7 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------
-# Prediction
+# Prediction & Pop-Up Modal
 # -----------------------------
 if submitted:
     model = load_model()
@@ -125,10 +125,49 @@ if submitted:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    if prediction == 0:
-        st.success("No Diabetes Risk Detected.")
-    else:
-        st.error("Possible Diabetes Risk Detected. Please consult a medical professional.")
+    result_text = (
+        "✅ No Diabetes Risk Detected." if prediction == 0
+        else "⚠️ Possible Diabetes Risk Detected. Please consult a medical professional."
+    )
+
+    st.markdown(
+        f"""
+        <div style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 9998;
+        "></div>
+
+        <div style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+            z-index: 9999;
+            text-align: center;
+        ">
+            <h3 style="color: {'green' if prediction == 0 else 'red'};">{result_text}</h3>
+            <button onclick="window.location.reload()" style="
+                margin-top: 1rem;
+                background: #2563eb;
+                color: white;
+                border: none;
+                padding: 0.6rem 1rem;
+                border-radius: 8px;
+                cursor: pointer;
+            ">Close</button>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 # -----------------------------
 # Footer
