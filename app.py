@@ -13,7 +13,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & CSS
+# Background & CSS (Fixed Rounded Top + Black Error Text)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -30,10 +30,13 @@ def set_background(image_path):
         .block-container {{
             background-color: rgba(255,255,255,0.97);
             padding: 2rem 3rem;
-            border-radius: 15px;
+            border-radius: 15px !important;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             max-width: 800px;
             margin: 2rem auto;
+        }}
+        .stAlert {{
+            color: black !important;
         }}
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
@@ -86,7 +89,7 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Session State for Loading and Result
+# Session State
 # -----------------------------
 if "loading" not in st.session_state:
     st.session_state.loading = False
@@ -121,29 +124,26 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic with Loading GIF
+# Prediction Logic (No Rerun)
 # -----------------------------
 if submitted:
     st.session_state.loading = True
     st.session_state.result = None
-    st.experimental_rerun()
 
-if st.session_state.loading:
-    # Show Centered Loading GIF
-    st.markdown(
-        f"""
-        <div style="text-align:center; margin-top: 30px;">
-            <img src="data:image/gif;base64,{loading_gif}" width="120">
-            <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Show Loading GIF
+    with st.container():
+        st.markdown(
+            f"""
+            <div style="text-align:center; margin-top: 20px;">
+                <img src="data:image/gif;base64,{loading_gif}" width="100">
+                <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    # Simulate processing delay
     time.sleep(1.5)
 
-    # Run Prediction
     model = load_model()
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -154,7 +154,6 @@ if st.session_state.loading:
 
     st.session_state.result = prediction
     st.session_state.loading = False
-    st.experimental_rerun()
 
 # -----------------------------
 # Show Result in a Clean Card
