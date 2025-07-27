@@ -43,9 +43,11 @@ add_bg_from_local("backgroundimage.jpg")
 # -----------------------------
 # Loading Overlay
 # -----------------------------
-st.markdown("""
+loading_gif = base64.b64encode(open("loadingPage.gif", "rb").read()).decode()
+
+st.markdown(f"""
 <style>
-#loading-overlay {
+#loading-overlay {{
     position: fixed;
     top: 0;
     left: 0;
@@ -57,15 +59,13 @@ st.markdown("""
     justify-content: center;
     align-items: center;
     visibility: hidden;
-}
+}}
 </style>
 
 <div id="loading-overlay">
-    <img src="data:image/gif;base64,{}" width="180">
+    <img src="data:image/gif;base64,{loading_gif}" width="180">
 </div>
-""".format(
-    base64.b64encode(open("loadingPage.gif", "rb").read()).decode()
-), unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # -----------------------------
 # Helper Functions
