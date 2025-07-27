@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & CSS (Button Text Fix + Card Styling)
+# Background & Custom CSS
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -26,36 +26,28 @@ def set_background(image_path):
             background-position: center;
             background-attachment: fixed;
         }}
-        .stAppViewContainer {{
-            background-color: rgba(255,255,255,0.97) !important;
-            border-radius: 15px !important;
-            padding: 2rem 3rem !important;
+        /* White Card Styling for Entire Section */
+        .block-container {{
+            background-color: rgba(255,255,255,0.97);
+            padding: 2rem 3rem;
+            border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            width: 95% !important;
-            max-width: 1200px !important;
-            margin: 2rem auto !important;
+            max-width: 800px;
+            margin: 2rem auto;
         }}
-        .stAlert {{ color: black !important; }}
-        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{ color: black !important; }}
-
-        /* ✅ Force Button Text White */
-        button[kind="primary"] {{
-            color: white !important;
+        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
+            color: black !important;
         }}
         .stButton>button {{
-            background: #2563eb !important;
-            color: white !important;
-            font-weight: bold !important;
-            border-radius: 8px !important;
-            padding: 0.6rem 1rem !important;
-            text-shadow: none !important;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-weight: bold;
         }}
         .stButton>button:hover {{
-            background: #1d4ed8 !important;
-            color: white !important;
-        }}
-        div.stButton button {{
-            color: white !important;
+            background: #1d4ed8;
+            color: white;
         }}
         </style>
         """,
@@ -63,15 +55,6 @@ def set_background(image_path):
     )
 
 set_background("backgroundimage.jpg")
-
-# -----------------------------
-# Encode Loading GIF
-# -----------------------------
-def get_gif_base64(gif_path):
-    with open(gif_path, "rb") as gif:
-        return base64.b64encode(gif.read()).decode()
-
-loading_gif = get_gif_base64("loadingPage.gif")
 
 # -----------------------------
 # Load Model
@@ -94,7 +77,17 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Input Form
+# Session State for Modal
+# -----------------------------
+if "show_modal" not in st.session_state:
+    st.session_state.show_modal = False
+if "result_text" not in st.session_state:
+    st.session_state.result_text = ""
+if "result_color" not in st.session_state:
+    st.session_state.result_color = "black"
+
+# -----------------------------
+# Input Form (White Background Card)
 # -----------------------------
 with st.form("diabetes_form"):
     st.subheader("Demographics")
@@ -121,22 +114,9 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic with Real-Time GIF
+# Prediction Logic
 # -----------------------------
 if submitted:
-    # Show Loading GIF at Top
-    with st.container():
-        st.markdown(
-            f"""
-            <div style="text-align:center; margin-top:10px;">
-                <img src="data:image/gif;base64,{loading_gif}" width="180">
-                <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    # Actual prediction (real-time)
     model = load_model()
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -145,39 +125,25 @@ if submitted:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    # Display Result
-    if prediction == 0:
+    st.session_state.result_text = (
+        "✅ No Diabetes Risk Detected." if prediction == 0
+        else "⚠️ Possible Diabetes Risk Detected. Please consult a medical professional."
+    )
+    st.session_state.result_color = "green" if prediction == 0 else "red"
+    st.session_state.show_modal = True
+
+# -----------------------------
+# Pop-Up Modal (Streamlit Native)
+# -----------------------------
+if st.session_state.show_modal:
+    st.markdown("---")
+    with st.container():
         st.markdown(
-            """
-            <div style="
-                background-color: #ecfdf5;
-                border: 1px solid #34d399;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                text-align: center;
-                margin-top: 1rem;
-            ">
-                <h3 style="color: #065f46; margin: 0;">✅ No Diabetes Risk Detected.</h3>
-            </div>
-            """,
+            f"<h3 style='text-align:center; color:{st.session_state.result_color};'>{st.session_state.result_text}</h3>",
             unsafe_allow_html=True
         )
-    else:
-        st.markdown(
-            """
-            <div style="
-                background-color: #fef2f2;
-                border: 1px solid #f87171;
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                text-align: center;
-                margin-top: 1rem;
-            ">
-                <h3 style="color: #991b1b; margin: 0;">⚠️ Possible Diabetes Risk Detected. Please consult a medical professional.</h3>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        if st.button("Close", key="close_modal"):
+            st.session_state.show_modal = False
 
 # -----------------------------
 # Footer
