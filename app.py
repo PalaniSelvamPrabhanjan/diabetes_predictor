@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS (White Card + Forced Blue Button)
+# Background & Custom CSS (No Button CSS)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -37,25 +37,6 @@ def set_background(image_path):
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
         }}
-
-        /* ✅ Force Blue Button (overrides dark mode) */
-        div.stButton > button:first-child {{
-            background-color: #1E88E5 !important;  /* Blue */
-            color: white !important;               /* White text */
-            border: none !important;
-            box-shadow: none !important;
-            border-radius: 8px !important;
-            padding: 0.6rem 1rem !important;
-            font-size: 1rem !important;
-            font-weight: 600 !important;
-            cursor: pointer !important;
-        }}
-        div.stButton > button:first-child:hover {{
-            background-color: #1565C0 !important;  /* Darker blue on hover */
-            color: white !important;
-        }}
-
-        /* ✅ Result Card */
         .result-box {{
             padding: 1rem;
             border-radius: 10px;
@@ -102,30 +83,30 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Input Form
+# Input Fields (No Form)
 # -----------------------------
-with st.form("diabetes_form"):
-    st.subheader("Demographics")
-    col1, col2 = st.columns(2)
-    with col1:
-        gender = st.selectbox("Gender", ["male", "female"])
-    with col2:
-        age = st.slider("Age", 0, 120, 30, 1)
+st.subheader("Demographics")
+col1, col2 = st.columns(2)
+with col1:
+    gender = st.selectbox("Gender", ["male", "female"])
+with col2:
+    age = st.slider("Age", 0, 120, 30, 1)
 
-    st.subheader("Medical History")
-    col3, col4 = st.columns(2)
-    with col3:
-        hypertension = st.selectbox("Hypertension", ["negative", "positive"])
-        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
-    with col4:
-        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
+st.subheader("Medical History")
+col3, col4 = st.columns(2)
+with col3:
+    hypertension = st.selectbox("Hypertension", ["negative", "positive"])
+    smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
+with col4:
+    heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-    st.subheader("Health Metrics")
-    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
-    blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+st.subheader("Health Metrics")
+bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-    submitted = st.form_submit_button("Check Risk", use_container_width=True)
+# ✅ Primary Blue Button
+submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
 # Prediction Logic
