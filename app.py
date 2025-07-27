@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & CSS (Rounded Top + Button White Text)
+# Background & CSS (Button Text Fix + Card Styling)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -30,25 +30,31 @@ def set_background(image_path):
             background-color: rgba(255,255,255,0.97) !important;
             border-radius: 15px !important;
             padding: 2rem 3rem !important;
-            max-width: 800px;
-            margin: 2rem auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            width: 95% !important;
+            max-width: 1200px !important;
+            margin: 2rem auto !important;
         }}
-        .stAlert {{
-            color: black !important;
-        }}
-        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
-            color: black !important;
+        .stAlert {{ color: black !important; }}
+        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{ color: black !important; }}
+
+        /* ✅ Force Button Text White */
+        button[kind="primary"] {{
+            color: white !important;
         }}
         .stButton>button {{
             background: #2563eb !important;
             color: white !important;
+            font-weight: bold !important;
             border-radius: 8px !important;
             padding: 0.6rem 1rem !important;
-            font-weight: bold !important;
+            text-shadow: none !important;
         }}
         .stButton>button:hover {{
             background: #1d4ed8 !important;
+            color: white !important;
+        }}
+        div.stButton button {{
             color: white !important;
         }}
         </style>
@@ -88,28 +94,6 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Session State
-# -----------------------------
-if "loading" not in st.session_state:
-    st.session_state.loading = False
-if "result" not in st.session_state:
-    st.session_state.result = None
-
-# -----------------------------
-# Loading GIF at Top (if active)
-# -----------------------------
-if st.session_state.loading:
-    st.markdown(
-        f"""
-        <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
-            <img src="data:image/gif;base64,{loading_gif}" width="180">
-            <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-# -----------------------------
 # Input Form
 # -----------------------------
 with st.form("diabetes_form"):
@@ -137,15 +121,22 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic
+# Prediction Logic with Real-Time GIF
 # -----------------------------
 if submitted:
-    st.session_state.loading = True
-    st.session_state.result = None
-    st.experimental_rerun()  # To immediately refresh and show GIF
+    # Show Loading GIF at Top
+    with st.container():
+        st.markdown(
+            f"""
+            <div style="text-align:center; margin-top:10px;">
+                <img src="data:image/gif;base64,{loading_gif}" width="180">
+                <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-if st.session_state.loading and st.session_state.result is None:
-    # Run Prediction after GIF is shown
+    # Actual prediction (real-time)
     model = load_model()
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -154,15 +145,8 @@ if st.session_state.loading and st.session_state.result is None:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    st.session_state.result = prediction
-    st.session_state.loading = False
-    st.experimental_rerun()
-
-# -----------------------------
-# Show Result in a Clean Card
-# -----------------------------
-if st.session_state.result is not None:
-    if st.session_state.result == 0:
+    # Display Result
+    if prediction == 0:
         st.markdown(
             """
             <div style="
