@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS (Only for Background + Cards)
+# Background & Custom CSS (No button overrides)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -104,14 +104,14 @@ with st.form("diabetes_form"):
 
     st.subheader("Health Metrics")
 
-    # ✅ HbA1c Title + Caption in One Row
-    col_hba1c1, col_hba1c2 = st.columns([1, 2.5])
+    # ✅ HbA1c Title + Caption on Same Row (Cleaned)
+    col_hba1c1, col_hba1c2 = st.columns([1.2, 2.5])
     with col_hba1c1:
-        st.markdown("**HbA1c Level (%) ***")
+        st.markdown("**HbA1c Level (%)**")
     with col_hba1c2:
-        st.caption("Reflects average blood sugar over past 2-3 months. ≥6.5% is diabetic.")
+        st.caption("Average sugar (2-3 months). ≥6.5% = diabetic.")
 
-    hba1c_level = st.slider("", 3.0, 15.0, 5.5, 0.1)  # Empty label since we used custom title
+    hba1c_level = st.slider("", 3.0, 15.0, 5.5, 0.1)  # Empty label
 
     # ✅ Other Sliders
     bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
