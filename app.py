@@ -2,188 +2,159 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
 
-# Configure page
+# -----------------------------
+# Page configuration
+# -----------------------------
 st.set_page_config(
     page_title="Diabetes Risk Predictor",
-    page_icon="🩺",
+    page_icon= "🩺",
     layout="centered"
 )
 
-# Title and description
-st.title("🩺 Diabetes Risk Predictor")
+# -----------------------------
+# Custom styling (background + status boxes)
+# -----------------------------
 st.markdown("""
-This tool uses a machine learning model to estimate your risk of diabetes based on health indicators.  
-**Please remember: This is not a medical diagnosis. Always consult a healthcare professional.**
-""")
+<style>
+.stApp {
+    background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+    url(data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+.metric-container {
+    background-color: rgba(255,255,255,0.95);
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 0.5rem 0;
+    border-left: 4px solid;
+}
+.healthy { border-left-color: #22c55e; }
+.warning { border-left-color: #f59e0b; }
+.danger { border-left-color: #ef4444; }
+</style>
+""", unsafe_allow_html=True)
 
+# -----------------------------
+# Page title
+# -----------------------------
+st.title("Diabetes Risk Predictor")
+st.markdown("""
+Estimate your likelihood of having diabetes based on key health indicators.  
+This tool is for information only and should not replace professional medical advice.
+""")
 st.markdown("---")
 
-# Load the model (with error handling)
+# -----------------------------
+# Load trained model
+# -----------------------------
 @st.cache_resource
 def load_model():
     try:
-        model = joblib.load('diabetes_model.joblib')
-        return model
+        return joblib.load('HGBCmodel.pkl')
     except FileNotFoundError:
-        st.error("⚠️ Model file 'diabetes_model.joblib' not found. Please ensure the file is in the same directory as this script.")
+        st.error("Model file 'HGBCmodel.pkl' not found. Make sure it is in the same folder as this script.")
         st.stop()
     except Exception as e:
-        st.error(f"⚠️ Error loading model: {str(e)}")
+        st.error(f"Error loading model: {str(e)}")
         st.stop()
 
-# Function to encode categorical variables (adjust based on your training encoding)
+# -----------------------------
+# Encode user inputs
+# -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
-    """
-    Encode categorical features to match training data encoding.
-    Adjust these mappings based on how your model was trained.
-    """
-    # Gender encoding
-    gender_encoded = 1 if gender == "male" else 0
-    
-    # Hypertension encoding  
-    hypertension_encoded = 1 if hypertension == "positive" else 0
-    
-    # Heart disease encoding
-    heart_disease_encoded = 1 if heart_disease == "positive" else 0
-    
-    # Smoking history encoding (adjust based on your label encoding)
+    gender_val = 1 if gender == "male" else 0
+    hypertension_val = 1 if hypertension == "positive" else 0
+    heart_disease_val = 1 if heart_disease == "positive" else 0
     smoking_map = {
         "No Info": 0,
-        "Current": 1, 
+        "Current": 1,
         "Never": 2,
         "Past": 3
     }
-    smoking_encoded = smoking_map[smoking_history]
-    
-    return gender_encoded, hypertension_encoded, heart_disease_encoded, smoking_encoded
+    smoking_val = smoking_map[smoking_history]
+    return gender_val, hypertension_val, heart_disease_val, smoking_val
 
-# Create the prediction form
+# -----------------------------
+# Input form
+# -----------------------------
 with st.form("diabetes_prediction_form"):
-    st.subheader("Enter Your Health Information")
-    
-    # Create two columns for better layout
+    st.subheader("Your Health Details")
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
-        # Categorical inputs
-        gender = st.selectbox(
-            "Gender",
-            ["male", "female"],
-            index=0
-        )
-        
-        hypertension = st.selectbox(
-            "Hypertension",
-            ["negative", "positive"],
-            index=0
-        )
-        
-        heart_disease = st.selectbox(
-            "Heart Disease", 
-            ["negative", "positive"],
-            index=0
-        )
-        
-        smoking_history = st.selectbox(
-            "Smoking History",
-            ["No Info", "Current", "Never", "Past"],
-            index=0
-        )
-    
+        gender = st.selectbox("Gender", ["male", "female"], index=0)
+        hypertension = st.selectbox("Hypertension", ["negative", "positive"], index=0)
+        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"], index=0)
+        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"], index=0)
+
     with col2:
-        # Numeric inputs
-        age = st.number_input(
-            "Age",
-            min_value=0,
-            max_value=120,
-            value=30,
-            step=1
-        )
-        
-        bmi = st.number_input(
-            "BMI (Body Mass Index)",
-            min_value=10.0,
-            max_value=60.0,
-            value=25.0,
-            step=0.1,
-            format="%.1f"
-        )
-        
-        # Sliders
-        blood_glucose = st.slider(
-            "Blood Glucose Level",
-            min_value=50,
-            max_value=300,
-            value=100,
-            step=1
-        )
-        
-        hba1c_level = st.slider(
-            "HbA1c Level",
-            min_value=3.0,
-            max_value=15.0,
-            value=5.5,
-            step=0.1,
-            format="%.1f"
-        )
-    
-    # Submit button
+        age = st.number_input("Age", min_value=0, max_value=120, value=30, step=1)
+
+        bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1, format="%.1f")
+        if bmi < 18.5:
+            st.markdown('<div class="metric-container warning">Underweight</div>', unsafe_allow_html=True)
+        elif 18.5 <= bmi <= 24.9:
+            st.markdown('<div class="metric-container healthy">Normal weight</div>', unsafe_allow_html=True)
+        elif 25 <= bmi <= 29.9:
+            st.markdown('<div class="metric-container warning">Overweight</div>', unsafe_allow_html=True)
+        elif 30 <= bmi <= 34.9:
+            st.markdown('<div class="metric-container danger">Obesity (Class 1)</div>', unsafe_allow_html=True)
+        elif 35 <= bmi <= 39.9:
+            st.markdown('<div class="metric-container danger">Obesity (Class 2)</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="metric-container danger">Obesity (Class 3, Severe)</div>', unsafe_allow_html=True)
+
+        blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+        if blood_glucose <= 100:
+            st.markdown('<div class="metric-container healthy">Normal (≤100 mg/dL)</div>', unsafe_allow_html=True)
+        elif 101 <= blood_glucose <= 125:
+            st.markdown('<div class="metric-container warning">Pre-diabetes (101–125 mg/dL)</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="metric-container danger">Diabetic range (≥126 mg/dL)</div>', unsafe_allow_html=True)
+
+        hba1c_level = st.slider("HbA1c Level (%)", 3.0, 15.0, 5.5, 0.1, format="%.1f")
+        if hba1c_level < 5.7:
+            st.markdown('<div class="metric-container healthy">Normal (<5.7%)</div>', unsafe_allow_html=True)
+        elif 5.7 <= hba1c_level <= 6.4:
+            st.markdown('<div class="metric-container warning">Pre-diabetes (5.7–6.4%)</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="metric-container danger">Diabetes (≥6.5%)</div>', unsafe_allow_html=True)
+
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
-    
+
     if submitted:
-        # Load model
         model = load_model()
-        
-        # Encode categorical features
-        gender_enc, hypertension_enc, heart_disease_enc, smoking_enc = encode_features(
+        gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
             gender, hypertension, heart_disease, smoking_history
         )
-        
-        # Prepare input data (adjust column order to match your training data)
         input_data = np.array([[
-            gender_enc,           # gender
-            age,                  # age  
-            hypertension_enc,     # hypertension
-            heart_disease_enc,    # heart_disease
-            smoking_enc,          # smoking_history
-            bmi,                  # bmi
-            hba1c_level,         # HbA1c_level
-            blood_glucose        # blood_glucose_level
+            gender_val, age, hypertension_val, heart_disease_val,
+            smoking_val, bmi, hba1c_level, blood_glucose
         ]])
-        
-        # Make prediction
+
         try:
             prediction = model.predict(input_data)[0]
-            
             st.markdown("---")
-            st.subheader("Prediction Result")
-            
+            st.subheader("Prediction")
             if prediction == 0:
-                # No diabetes
-                st.success("❌ **No signs of diabetes detected**")
-                st.balloons()
+                st.success("No signs of diabetes detected.")
             else:
-                # Diabetes detected
-                st.warning("""
-                ✅ **Possible signs of diabetes detected**
-                
-                Please note: This model is not always accurate.  
-                Consult a healthcare professional for proper medical evaluation.
-                """)
-                
+                st.warning("Possible risk of diabetes detected. Consult a healthcare professional for further evaluation.")
         except Exception as e:
-            st.error(f"⚠️ Error making prediction: {str(e)}")
+            st.error(f"Prediction error: {str(e)}")
 
-# Add footer information
+# -----------------------------
+# Footer
+# -----------------------------
 st.markdown("---")
 st.markdown("""
 <small>
-**Disclaimer:** This tool is for educational purposes only and should not replace professional medical advice, diagnosis, or treatment. 
-Always seek the advice of qualified health providers with any questions you may have regarding a medical condition.
+This tool is for educational use only and should not be used as a substitute for professional medical advice.  
+Always consult a qualified healthcare professional for any medical concerns.
 </small>
 """, unsafe_allow_html=True)
-
-# Add some space at the bottom
 st.markdown("<br><br>", unsafe_allow_html=True)
