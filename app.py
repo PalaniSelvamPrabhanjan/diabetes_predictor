@@ -2,7 +2,6 @@ import streamlit as st
 import joblib
 import numpy as np
 import base64
-import time
 
 # -----------------------------
 # Page configuration
@@ -13,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & CSS (Fixed Rounded Top + Black Error Text)
+# Background & CSS (Rounded Top + Button White Text)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -27,13 +26,13 @@ def set_background(image_path):
             background-position: center;
             background-attachment: fixed;
         }}
-        .block-container {{
-            background-color: rgba(255,255,255,0.97);
-            padding: 2rem 3rem;
+        .stAppViewContainer {{
+            background-color: rgba(255,255,255,0.97) !important;
             border-radius: 15px !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            padding: 2rem 3rem !important;
             max-width: 800px;
             margin: 2rem auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }}
         .stAlert {{
             color: black !important;
@@ -97,6 +96,20 @@ if "result" not in st.session_state:
     st.session_state.result = None
 
 # -----------------------------
+# Loading GIF at Top (if active)
+# -----------------------------
+if st.session_state.loading:
+    st.markdown(
+        f"""
+        <div style="text-align:center; margin-top:10px; margin-bottom:20px;">
+            <img src="data:image/gif;base64,{loading_gif}" width="180">
+            <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# -----------------------------
 # Input Form
 # -----------------------------
 with st.form("diabetes_form"):
@@ -124,26 +137,15 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic (No Rerun)
+# Prediction Logic
 # -----------------------------
 if submitted:
     st.session_state.loading = True
     st.session_state.result = None
+    st.experimental_rerun()  # To immediately refresh and show GIF
 
-    # Show Loading GIF
-    with st.container():
-        st.markdown(
-            f"""
-            <div style="text-align:center; margin-top: 20px;">
-                <img src="data:image/gif;base64,{loading_gif}" width="100">
-                <p style="color:#374151; font-size:16px;">Analyzing your health data...</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    time.sleep(1.5)
-
+if st.session_state.loading and st.session_state.result is None:
+    # Run Prediction after GIF is shown
     model = load_model()
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -154,6 +156,7 @@ if submitted:
 
     st.session_state.result = prediction
     st.session_state.loading = False
+    st.experimental_rerun()
 
 # -----------------------------
 # Show Result in a Clean Card
