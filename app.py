@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS (White Card + Blue Button)
+# Background & Custom CSS (White Card + Forced Blue Button)
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -38,19 +38,21 @@ def set_background(image_path):
             color: black !important;
         }}
 
-        /* ✅ Blue Button */
-        .stButton > button {{
-            background-color: #1E88E5 !important; /* Blue */
-            color: white !important;              /* White text */
+        /* ✅ Force Blue Button (overrides dark mode) */
+        div.stButton > button:first-child {{
+            background-color: #1E88E5 !important;  /* Blue */
+            color: white !important;               /* White text */
             border: none !important;
+            box-shadow: none !important;
             border-radius: 8px !important;
             padding: 0.6rem 1rem !important;
             font-size: 1rem !important;
             font-weight: 600 !important;
             cursor: pointer !important;
         }}
-        .stButton > button:hover {{
-            background-color: #1565C0 !important; /* Darker blue on hover */
+        div.stButton > button:first-child:hover {{
+            background-color: #1565C0 !important;  /* Darker blue on hover */
+            color: white !important;
         }}
 
         /* ✅ Result Card */
