@@ -59,8 +59,29 @@ def set_background(image_path):
         """,
         unsafe_allow_html=True
     )
-
+    
 set_background("backgroundimage.jpg")
+
+# ✅ Force Blue Button
+st.markdown("""
+<style>
+div.stButton > button:first-child {
+    background-color: #1E88E5 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.6rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+}
+div.stButton > button:first-child:hover {
+    background-color: #1565C0 !important;
+    color: white !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # -----------------------------
 # Load Model
