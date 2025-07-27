@@ -106,7 +106,7 @@ blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
 # ✅ Primary Blue Button
-submitted = st.button("Check Risk", use_container_width=True)
+submitted =  st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
 # Prediction Logic
