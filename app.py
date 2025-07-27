@@ -26,7 +26,6 @@ def set_background(image_path):
             background-position: center;
             background-attachment: fixed;
         }}
-        /* White Card Styling for Entire Section */
         .block-container {{
             background-color: rgba(255,255,255,0.97);
             padding: 2rem 3rem;
@@ -40,14 +39,14 @@ def set_background(image_path):
         }}
         .stButton>button {{
             background: #2563eb;
-            color: white;
+            color: white !important;  /* ✅ White text */
             border-radius: 8px;
             padding: 0.6rem 1rem;
             font-weight: bold;
         }}
         .stButton>button:hover {{
             background: #1d4ed8;
-            color: white;
+            color: white !important;  /* ✅ Keeps white text on hover */
         }}
         </style>
         """,
@@ -77,17 +76,7 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Session State for Modal
-# -----------------------------
-if "show_modal" not in st.session_state:
-    st.session_state.show_modal = False
-if "result_text" not in st.session_state:
-    st.session_state.result_text = ""
-if "result_color" not in st.session_state:
-    st.session_state.result_color = "black"
-
-# -----------------------------
-# Input Form (White Background Card)
+# Input Form
 # -----------------------------
 with st.form("diabetes_form"):
     st.subheader("Demographics")
@@ -114,36 +103,29 @@ with st.form("diabetes_form"):
     submitted = st.form_submit_button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic
+# Prediction Logic (With Spinner)
 # -----------------------------
 if submitted:
-    model = load_model()
-    gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
-        gender, hypertension, heart_disease, smoking_history
-    )
-    input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
-                            smoking_val, bmi, hba1c_level, blood_glucose]])
-    prediction = model.predict(input_data)[0]
+    with st.spinner("🔄 Checking your diabetes risk..."):
+        model = load_model()
+        gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
+            gender, hypertension, heart_disease, smoking_history
+        )
+        input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
+                                smoking_val, bmi, hba1c_level, blood_glucose]])
+        prediction = model.predict(input_data)[0]
 
-    st.session_state.result_text = (
+    result_text = (
         "✅ No Diabetes Risk Detected." if prediction == 0
         else "⚠️ Possible Diabetes Risk Detected. Please consult a medical professional."
     )
-    st.session_state.result_color = "green" if prediction == 0 else "red"
-    st.session_state.show_modal = True
+    result_color = "green" if prediction == 0 else "red"
 
-# -----------------------------
-# Pop-Up Modal (Streamlit Native)
-# -----------------------------
-if st.session_state.show_modal:
     st.markdown("---")
-    with st.container():
-        st.markdown(
-            f"<h3 style='text-align:center; color:{st.session_state.result_color};'>{st.session_state.result_text}</h3>",
-            unsafe_allow_html=True
-        )
-        if st.button("Close", key="close_modal"):
-            st.session_state.show_modal = False
+    st.markdown(
+        f"<h3 style='text-align:center; color:{result_color};'>{result_text}</h3>",
+        unsafe_allow_html=True
+    )
 
 # -----------------------------
 # Footer
