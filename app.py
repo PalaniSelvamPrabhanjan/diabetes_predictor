@@ -2,6 +2,7 @@ import streamlit as st
 import joblib
 import numpy as np
 import base64
+import time
 
 # -----------------------------
 # Page configuration
@@ -12,7 +13,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS (No Button CSS)
+# Background & Custom CSS
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -62,11 +63,11 @@ def set_background(image_path):
 
 set_background("backgroundimage.jpg")
 
-# Force Blue Button
+# Button styling
 st.markdown("""
 <style>
 div.stButton > button:first-child span {
-    color: white !important;  /* ✅ Target the inner text span */
+    color: white !important;
 }
 div.stButton > button:first-child {
     background-color: #1E88E5 !important;
@@ -83,14 +84,22 @@ div.stButton > button:first-child:hover {
 </style>
 """, unsafe_allow_html=True)
 
-
 # -----------------------------
-# Load Model
+# Load Model with Timer
 # -----------------------------
 @st.cache_resource
 def load_model():
-    return joblib.load("HGBCmodel.pkl")
+    start = time.time()
+    model = joblib.load("HGBCmodel.pkl")
+    end = time.time()
+    st.write(f"🕒 Model loaded in {end - start:.2f} seconds")
+    return model
 
+model = load_model()
+
+# -----------------------------
+# Helper Function
+# -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
     hypertension_val = 1 if hypertension == "positive" else 0
@@ -105,7 +114,7 @@ st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsaf
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
 # -----------------------------
-# Input Fields (No Form)
+# Input Fields
 # -----------------------------
 st.subheader("Demographics")
 col1, col2 = st.columns(2)
@@ -127,15 +136,14 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# ✅ Primary Blue Button
-submitted =  st.button("Check Risk", use_container_width=True)
+# Button
+submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
 # Prediction Logic
 # -----------------------------
 if submitted:
     with st.spinner("🔄 Checking your diabetes risk..."):
-        model = load_model()
         gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
             gender, hypertension, heart_disease, smoking_history
         )
