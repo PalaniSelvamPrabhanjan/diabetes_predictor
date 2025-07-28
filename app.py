@@ -35,9 +35,6 @@ def set_background(image_path):
             max-width: 800px;
             margin: 2rem auto;
         }}
-        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
-            color: black !important;
-        }}
         .result-box {{
             padding: 1rem;
             border-radius: 10px;
@@ -118,23 +115,37 @@ hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction + Centered GIF
+# Prediction + Fullscreen Centered GIF
 # -----------------------------
 if submitted:
-    # Show loading GIF centered
+    # Centered fullscreen loading GIF
     gif_placeholder = st.empty()
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <div style="display: flex; justify-content: center; align-items: center; height: 300px;">
+        <style>
+        .fullscreen-loader {{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255,255,255,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }}
+        </style>
+        <div class="fullscreen-loader">
             <img src="data:image/gif;base64,{base64_gif}" width="100">
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Ensure GIF shows at least 3 seconds
+    # Ensure GIF is shown for at least 3 seconds
     start_time = time.time()
     model = joblib.load("HGBCmodel.pkl")
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
@@ -147,7 +158,6 @@ if submitted:
     if elapsed < 3:
         time.sleep(3 - elapsed)
 
-    # Remove GIF
     gif_placeholder.empty()
 
     # Show result
