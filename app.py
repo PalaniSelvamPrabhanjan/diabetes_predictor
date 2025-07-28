@@ -123,7 +123,7 @@ submitted = st.button("Check Risk", use_container_width=True)
 if submitted:
     # Show loading GIF
     gif_placeholder = st.empty()
-    with open("loading.gif", "rb") as f:
+    with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f'<div style="text-align:center;"><img src="data:image/gif;base64,{base64_gif}" width="100"></div>',
