@@ -13,11 +13,22 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Background & Custom CSS
+# Background & CSS
 # -----------------------------
-def set_background(image_path):
+def set_background(image_path, show_form=True):
     with open(image_path, "rb") as img:
         encoded = base64.b64encode(img.read()).decode()
+    container_style = """
+        .block-container {
+            background-color: rgba(255,255,255,0.97);
+            padding: 2rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+    """ if show_form else ""  # hide white overlay when loading
+
     st.markdown(
         f"""
         <style>
@@ -27,13 +38,9 @@ def set_background(image_path):
             background-position: center;
             background-attachment: fixed;
         }}
-        .block-container {{
-            background-color: rgba(255,255,255,0.97);
-            padding: 2rem 3rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            max-width: 800px;
-            margin: 2rem auto;
+        {container_style}
+        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
+            color: black !important;
         }}
         .result-box {{
             padding: 1rem;
@@ -73,117 +80,78 @@ def set_background(image_path):
         unsafe_allow_html=True
     )
 
-set_background("backgroundimage.jpg")
-
 # -----------------------------
-# Encode features
+# UI and Logic
 # -----------------------------
-def encode_features(gender, hypertension, heart_disease, smoking_history):
-    gender_val = 1 if gender == "male" else 0
-    hypertension_val = 1 if hypertension == "positive" else 0
-    heart_disease_val = 1 if heart_disease == "positive" else 0
-    smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
-    return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
+if "predict_clicked" not in st.session_state:
+    st.session_state.predict_clicked = False
 
-# -----------------------------
-# UI
-# -----------------------------
-st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+if not st.session_state.predict_clicked:
+    set_background("backgroundimage.jpg", show_form=True)
 
-st.subheader("Demographics")
-col1, col2 = st.columns(2)
-with col1:
-    gender = st.selectbox("Gender", ["male", "female"])
-with col2:
-    age = st.slider("Age", 0, 120, 30, 1)
+    st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
-st.subheader("Medical History")
-col3, col4 = st.columns(2)
-with col3:
-    hypertension = st.selectbox("Hypertension", ["negative", "positive"])
-    smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
-with col4:
-    heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
+    st.subheader("Demographics")
+    col1, col2 = st.columns(2)
+    with col1:
+        gender = st.selectbox("Gender", ["male", "female"])
+    with col2:
+        age = st.slider("Age", 0, 120, 30, 1)
 
-st.subheader("Health Metrics")
-bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
-blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+    st.subheader("Medical History")
+    col3, col4 = st.columns(2)
+    with col3:
+        hypertension = st.selectbox("Hypertension", ["negative", "positive"])
+        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
+    with col4:
+        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-# ✅ Submit Button
-submitted = st.button("Check Risk", use_container_width=True)
+    st.subheader("Health Metrics")
+    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+    blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# -----------------------------
-# Prediction + Fullscreen Centered GIF
-# -----------------------------
-if submitted:
-    # Centered fullscreen loading GIF
+    submitted = st.button("Check Risk", use_container_width=True)
+    if submitted:
+        st.session_state.predict_clicked = True
+        st.session_state.inputs = (gender, age, hypertension, heart_disease, smoking_history, bmi, blood_glucose, hba1c_level)
+        st.rerun()
+
+else:
+    set_background("backgroundimage.jpg", show_form=False)
+
     gif_placeholder = st.empty()
     with open("loadingPage.gif", "rb") as f:
-        base64_gif = base64.b64encode(f.read()).decode()
+        gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <style>
-        .fullscreen-loader {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(255,255,255,0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }}
-        </style>
-        <div class="fullscreen-loader">
-            <img src="data:image/gif;base64,{base64_gif}" width="100">
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;">
+            <img src="data:image/gif;base64,{gif}" width="120">
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Ensure GIF is shown for at least 3 seconds
     start_time = time.time()
     model = joblib.load("HGBCmodel.pkl")
-    gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
-        gender, hypertension, heart_disease, smoking_history
-    )
-    input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
-                            smoking_val, bmi, hba1c_level, blood_glucose]])
+    gender, age, hypertension, heart_disease, smoking_history, bmi, blood_glucose, hba1c_level = st.session_state.inputs
+
+    def encode_features(gender, hypertension, heart_disease, smoking_history):
+        gender_val = 1 if gender == "male" else 0
+        hypertension_val = 1 if hypertension == "positive" else 0
+        heart_disease_val = 1 if heart_disease == "positive" else 0
+        smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
+        return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
+
+    gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(gender, hypertension, heart_disease, smoking_history)
+    input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val, smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
+
     elapsed = time.time() - start_time
     if elapsed < 3:
         time.sleep(3 - elapsed)
 
     gif_placeholder.empty()
-
-    # Show result
-    if prediction == 0:
-        result_icon = "✅"
-        result_text = "No Diabetes Risk Detected"
-        explanation = "No signs of diabetes were detected based on the provided information."
-        box_class = "green-box"
-    else:
-        result_icon = "⚠️"
-        result_text = "Possible Diabetes Risk Detected"
-        explanation = "Your results suggest a potential risk. Please consult a medical professional."
-        box_class = "red-box"
-
-    st.markdown(
-        f"""
-        <div class="result-box {box_class}">
-            {result_icon} <strong>{result_text}</strong><br>
-            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-# -----------------------------
-# Footer
-# -----------------------------
-st.markdown("---")
-st.markdown("<small>This tool is for rough prediction only. Always consult a medical professional.</small>", unsafe_allow_html=True)
+    st.session_state.predict_clicked = False
+    st.rerun()
