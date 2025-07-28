@@ -118,23 +118,28 @@ hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction + GIF
+# Prediction + Loading GIF
 # -----------------------------
 if submitted:
-    # Show loading GIF
+    # Show loading GIF (centered full page)
     gif_placeholder = st.empty()
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
-        f'<div style="text-align:center;"><img src="data:image/gif;base64,{base64_gif}" width="100"></div>',
+        f"""
+        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    display: flex; justify-content: center; align-items: center;
+                    background-color: rgba(255, 255, 255, 0.75); z-index: 9999;">
+            <img src="data:image/gif;base64,{base64_gif}" width="120">
+        </div>
+        """,
         unsafe_allow_html=True
     )
 
-    # Minimum GIF time
-    min_display = 2
-    start = time.time()
+    # Force at least 3 seconds of GIF
+    time.sleep(3)
 
-    # Load model and predict
+    # Load model and make prediction
     model = joblib.load("HGBCmodel.pkl")
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -143,12 +148,7 @@ if submitted:
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
 
-    # Wait if less than 2s passed
-    elapsed = time.time() - start
-    if elapsed < min_display:
-        time.sleep(min_display - elapsed)
-
-    # Remove GIF
+    # Remove loading GIF
     gif_placeholder.empty()
 
     # Show result
