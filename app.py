@@ -56,6 +56,21 @@ def set_background(image_path):
             color: #991b1b;
             border: 1px solid #f87171;
         }}
+        div.stButton > button:first-child span {{
+            color: white !important;
+        }}
+        div.stButton > button:first-child {{
+            background-color: #1E88E5 !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 0.6rem 1rem !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+        }}
+        div.stButton > button:first-child:hover {{
+            background-color: #1565C0 !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -63,29 +78,8 @@ def set_background(image_path):
 
 set_background("backgroundimage.jpg")
 
-# Blue Button CSS
-st.markdown("""
-<style>
-div.stButton > button:first-child span {
-    color: white !important;
-}
-div.stButton > button:first-child {
-    background-color: #1E88E5 !important;
-    border: none !important;
-    border-radius: 8px !important;
-    padding: 0.6rem 1rem !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-}
-div.stButton > button:first-child:hover {
-    background-color: #1565C0 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 # -----------------------------
-# Helper Functions
+# Encode features
 # -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
@@ -95,14 +89,11 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
     return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
 
 # -----------------------------
-# Page Title
+# UI
 # -----------------------------
 st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
-# -----------------------------
-# Input Fields
-# -----------------------------
 st.subheader("Demographics")
 col1, col2 = st.columns(2)
 with col1:
@@ -123,25 +114,37 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# Submit Button
+# ✅ Submit Button
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction Logic
+# Prediction + GIF
 # -----------------------------
 if submitted:
-    with st.spinner("🔄 Checking your diabetes risk..."):
-        start = time.time()
-        model = joblib.load("HGBCmodel.pkl")
-        st.write(f"🕒 Model loaded in {time.time() - start:.2f} seconds")
+    # Show loading GIF
+    gif_placeholder = st.empty()
+    with open("loading.gif", "rb") as f:
+        base64_gif = base64.b64encode(f.read()).decode()
+    gif_placeholder.markdown(
+        f'<div style="text-align:center;"><img src="data:image/gif;base64,{base64_gif}" width="100"></div>',
+        unsafe_allow_html=True
+    )
 
-        gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
-            gender, hypertension, heart_disease, smoking_history
-        )
-        input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
-                                smoking_val, bmi, hba1c_level, blood_glucose]])
-        prediction = model.predict(input_data)[0]
+    # Simulate processing + load model
+    start_time = time.time()
+    model = joblib.load("HGBCmodel.pkl")
+    gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
+        gender, hypertension, heart_disease, smoking_history
+    )
+    input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
+                            smoking_val, bmi, hba1c_level, blood_glucose]])
+    prediction = model.predict(input_data)[0]
+    load_duration = time.time() - start_time
 
+    # Remove GIF
+    gif_placeholder.empty()
+
+    # Show result
     if prediction == 0:
         result_icon = "✅"
         result_text = "No Diabetes Risk Detected"
@@ -158,7 +161,8 @@ if submitted:
         f"""
         <div class="result-box {box_class}">
             {result_icon} <strong>{result_text}</strong><br>
-            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
+            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span><br>
+            <span style="font-size:0.75rem;">Model loaded in {load_duration:.2f} seconds</span>
         </div>
         """,
         unsafe_allow_html=True
