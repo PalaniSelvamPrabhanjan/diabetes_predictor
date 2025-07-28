@@ -63,7 +63,7 @@ def set_background(image_path):
 
 set_background("backgroundimage.jpg")
 
-# Button styling
+# Blue Button CSS
 st.markdown("""
 <style>
 div.stButton > button:first-child span {
@@ -85,20 +85,7 @@ div.stButton > button:first-child:hover {
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Load Model with Timer
-# -----------------------------
-@st.cache_resource
-def load_model():
-    start = time.time()
-    model = joblib.load("HGBCmodel.pkl")
-    end = time.time()
-    st.write(f"🕒 Model loaded in {end - start:.2f} seconds")
-    return model
-
-model = load_model()
-
-# -----------------------------
-# Helper Function
+# Helper Functions
 # -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
@@ -136,7 +123,7 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# Button
+# Submit Button
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
@@ -144,6 +131,10 @@ submitted = st.button("Check Risk", use_container_width=True)
 # -----------------------------
 if submitted:
     with st.spinner("🔄 Checking your diabetes risk..."):
+        start = time.time()
+        model = joblib.load("HGBCmodel.pkl")
+        st.write(f"🕒 Model loaded in {time.time() - start:.2f} seconds")
+
         gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
             gender, hypertension, heart_disease, smoking_history
         )
