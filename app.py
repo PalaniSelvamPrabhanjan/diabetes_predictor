@@ -42,7 +42,7 @@ def set_background(image_path):
             padding: 1rem;
             border-radius: 10px;
             font-size: 1.1rem;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
             text-align: center;
             font-weight: 600;
         }}
@@ -118,28 +118,24 @@ hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction + Loading GIF
+# Prediction + Centered GIF
 # -----------------------------
 if submitted:
-    # Show loading GIF (centered full page)
+    # Show loading GIF centered
     gif_placeholder = st.empty()
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                    display: flex; justify-content: center; align-items: center;
-                    background-color: rgba(255, 255, 255, 0.75); z-index: 9999;">
-            <img src="data:image/gif;base64,{base64_gif}" width="120">
+        <div style="display: flex; justify-content: center; align-items: center; height: 300px;">
+            <img src="data:image/gif;base64,{base64_gif}" width="100">
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # Force at least 3 seconds of GIF
-    time.sleep(3)
-
-    # Load model and make prediction
+    # Ensure GIF shows at least 3 seconds
+    start_time = time.time()
     model = joblib.load("HGBCmodel.pkl")
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -147,8 +143,11 @@ if submitted:
     input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
+    elapsed = time.time() - start_time
+    if elapsed < 3:
+        time.sleep(3 - elapsed)
 
-    # Remove loading GIF
+    # Remove GIF
     gif_placeholder.empty()
 
     # Show result
@@ -163,7 +162,6 @@ if submitted:
         explanation = "Your results suggest a potential risk. Please consult a medical professional."
         box_class = "red-box"
 
-    st.markdown("---")
     st.markdown(
         f"""
         <div class="result-box {box_class}">
