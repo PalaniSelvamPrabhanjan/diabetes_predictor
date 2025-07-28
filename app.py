@@ -130,8 +130,11 @@ if submitted:
         unsafe_allow_html=True
     )
 
-    # Simulate processing + load model
-    start_time = time.time()
+    # Minimum GIF time
+    min_display = 2
+    start = time.time()
+
+    # Load model and predict
     model = joblib.load("HGBCmodel.pkl")
     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
         gender, hypertension, heart_disease, smoking_history
@@ -139,7 +142,11 @@ if submitted:
     input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
                             smoking_val, bmi, hba1c_level, blood_glucose]])
     prediction = model.predict(input_data)[0]
-    load_duration = time.time() - start_time
+
+    # Wait if less than 2s passed
+    elapsed = time.time() - start
+    if elapsed < min_display:
+        time.sleep(min_display - elapsed)
 
     # Remove GIF
     gif_placeholder.empty()
@@ -161,8 +168,7 @@ if submitted:
         f"""
         <div class="result-box {box_class}">
             {result_icon} <strong>{result_text}</strong><br>
-            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span><br>
-            <span style="font-size:0.75rem;">Model loaded in {load_duration:.2f} seconds</span>
+            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
         </div>
         """,
         unsafe_allow_html=True
