@@ -70,9 +70,11 @@ def set_background(image_path):
         [data-testid="stTickBar"] {{
             background: none !important;
         }}
-        span[data-testid="stTickLabel"] {{
+        /* ✅ Fix slider tick labels (0, 120, etc.) */
+        div[data-testid="stTickBar"] > div > div {{
             color: black !important;
             background: transparent !important;
+            font-weight: 600;
         }}
         div[role="slider"] > div > span {{
             color: black !important;
