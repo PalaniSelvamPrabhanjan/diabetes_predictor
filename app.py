@@ -362,7 +362,7 @@ if submitted:
     }
 
     # Requires Streamlit ≥ 1.22
-    st.switch_page("pages/Results.py")
+    st.switch_page("pages/results.py")
 
 st.markdown("---")
 st.markdown("<small>This tool is for rough prediction only. Always consult a medical professional.</small>", unsafe_allow_html=True)
