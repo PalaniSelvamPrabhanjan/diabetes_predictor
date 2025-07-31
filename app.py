@@ -63,10 +63,9 @@ def set_background(image_path):
             font-size: 1rem !important;
             font-weight: 600 !important;
             cursor: pointer !important;
-            transition: background-color 0.2s;
         }}
         div.stButton > button:first-child:active {{
-            background-color: #007bff !important;
+            background-color: #003366 !important;
         }}
         div.stButton {{
             padding-top: 2rem;
@@ -74,20 +73,20 @@ def set_background(image_path):
         [data-testid="stTickBar"] {{
             background: none !important;
         }}
-        div[data-testid="stSlider"] [data-testid="stTickBar"] div {{
+        [data-testid="stSliderTickBarMin"],
+        [data-testid="stSliderTickBarMax"] {{
             color: #a1daf8 !important;
-            background-color: transparent !important;
             font-weight: 600;
-        }}
-        div[role="slider"] > div > span {{
-            color: #a1daf8 !important;
         }}
         div[data-baseweb="slider"] .st-cv {{
             background: #a1daf8 !important;
         }}
         div[data-baseweb="slider"] .st-emotion-cache-1dj3ksd {{
             background-color: #a1daf8 !important;
-            border: 2px solid #5eb3d1 !important;
+            border: 2px solid #6cc3dd !important;
+        }}
+        div[data-testid="stSliderThumbValue"] {{
+            color: #a1daf8 !important;
         }}
         .lifestyle-title {{
             text-align: left;
@@ -150,17 +149,16 @@ with col3:
 with col4:
     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-st.subheader("Health Metrics")
-st.markdown("<p>Calculated BMI:</p>", unsafe_allow_html=True)
-col_h, col_w = st.columns(2)
-with col_h:
+col5, col6 = st.columns(2)
+with col5:
     height_cm = st.number_input("Height (cm)", min_value=100, max_value=250, value=170)
-with col_w:
-    weight_kg = st.number_input("Weight (kg)", min_value=30, max_value=200, value=70)
+with col6:
+    weight_kg = st.number_input("Weight (kg)", min_value=30, max_value=250, value=70)
 height_m = height_cm / 100
 bmi = round(weight_kg / (height_m ** 2), 2)
-st.markdown(f"<p style='margin-top:-0.5rem;'>BMI = <strong>{bmi}</strong></p>", unsafe_allow_html=True)
+st.markdown(f"<p>Calculated BMI: {bmi}</p>", unsafe_allow_html=True)
 
+st.subheader("Health Metrics")
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
@@ -204,9 +202,9 @@ if submitted:
     else:
         notes = ""
         if blood_glucose > 200:
-            notes += "<li>Blood Glucose Level is high</li>"
+            notes += "<li>Blood Glucose Level is high (above 200 mg/dL)</li>"
         if hba1c_level > 6.5:
-            notes += "<li>HbA1c Level is high</li>"
+            notes += "<li>HbA1c Level is high (above 6.5%)</li>"
 
         st.markdown(f"""
             <div class="result-box red-box">
