@@ -68,10 +68,10 @@ def set_background(image_path):
             background-color: #a1daf8 !important;  /* Thumb (circle) */
             border: 2px solid white !important;
         }}
-        </style>
-        div[data-testid="stSlider"] > div > div {{
+         div[data-testid="stSlider"] > div > div {{
             background: linear-gradient(to right, #a1daf8 0%, #a1daf8 100%) !important;  /* Track */
         }}
+        </style>
         """,
         unsafe_allow_html=True
     )
