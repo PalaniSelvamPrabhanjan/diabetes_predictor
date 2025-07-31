@@ -131,7 +131,8 @@ def set_background(image_path):
 
         /* drop down design border on active */
         /* Dropdown (selectbox) arrow on hover */
-        div[role="combobox"]:hover {{
+        div[role="combobox"]:hover,
+        div[role="combobox"]:active {{
             border: none !important;
             box-shadow: none !important;
         }}
