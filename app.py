@@ -50,11 +50,9 @@ def set_background(image_path):
             color: #991b1b;
             border: 1px solid #f87171;
         }}
-        div.stButton > button:first-child span {{
-            color: white !important;
-        }}
         div.stButton > button:first-child {{
             background-color: #a1daf8 !important;
+            color: white !important;
             border: none !important;
             border-radius: 8px !important;
             padding: 0.6rem 1rem !important;
@@ -63,15 +61,11 @@ def set_background(image_path):
             cursor: pointer !important;
         }}
         div.stButton > button:first-child:hover {{
-            background-color: #1565C0 !important;
+            background-color: #7cc7e2 !important;
         }}
 
-        /* ✅ Slider Styling */
-        div[data-testid="stSlider"] > div > div {{
-            background: #a1daf8 !important;
-        }}
         div[role="slider"] {{
-            background-color: #a1daf8 !important;
+            background-color: #a1daf8 !important;  /* Thumb (circle) */
             border: 2px solid white !important;
         }}
         </style>
@@ -117,16 +111,18 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# Button + Placeholder (GIF BELOW the button)
-gif_placeholder = st.empty()
+# -----------------------------
+# Button + Loading GIF placeholder (below the button)
+# -----------------------------
 submitted = st.button("Check Risk", use_container_width=True)
+gif_placeholder = st.empty()
 
 if submitted:
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <div style="text-align:center; margin-top: 1rem;">
+        <div style="text-align:center;">
             <img src="data:image/gif;base64,{base64_gif}" width="100">
         </div>
         """,
