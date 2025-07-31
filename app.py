@@ -55,7 +55,7 @@ def set_background(image_path):
             border: 1px solid #f87171;
         }}
         div.stButton > button:first-child {{
-            background-color: #a1daf8 !important;
+            background-color: #007bff !important;
             color: white !important;
             border: none !important;
             border-radius: 8px !important;
@@ -70,16 +70,20 @@ def set_background(image_path):
         [data-testid="stTickBar"] {{
             background: none !important;
         }}
-        /* ✅ FINAL FIX: Correct tick label color (0 and 120) */
-        [data-testid="stSliderTickBarMin"],
-        [data-testid="stSliderTickBarMax"] {{
+        div[data-testid="stSlider"] [data-testid="stTickBar"] div {{
             color: black !important;
-            background: transparent !important;
-            opacity: 1 !important;
+            background-color: transparent !important;
             font-weight: 600;
         }}
         div[role="slider"] > div > span {{
             color: black !important;
+        }}
+        div[data-baseweb="slider"] .st-cv {{
+            background: #007bff !important;
+        }}
+        div[data-baseweb="slider"] .st-emotion-cache-1dj3ksd {{
+            background-color: #007bff !important;
+            border: 2px solid #0056b3 !important;
         }}
         .lifestyle-title {{
             text-align: left;
@@ -143,7 +147,12 @@ with col4:
     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
 st.subheader("Health Metrics")
-bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+height_cm = st.slider("Height (cm)", 120, 220, 170, 1)
+weight_kg = st.slider("Weight (kg)", 30, 200, 70, 1)
+height_m = height_cm / 100
+bmi = round(weight_kg / (height_m ** 2), 2)
+st.markdown(f"<p style='margin-bottom:0'><b>Calculated BMI:</b> {bmi}</p>", unsafe_allow_html=True)
+
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
