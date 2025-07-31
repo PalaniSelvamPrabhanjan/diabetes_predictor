@@ -4,10 +4,13 @@ import numpy as np
 import base64
 import time
 
+# -----------------------------
+# Page configuration
+# -----------------------------
 st.set_page_config(page_title="Diabetes Risk Predictor", layout="centered")
 
 # -----------------------------
-# Background & Full Custom CSS
+# Background & Custom CSS
 # -----------------------------
 def set_background(image_path):
     with open(image_path, "rb") as img:
@@ -15,7 +18,6 @@ def set_background(image_path):
     st.markdown(
         f"""
         <style>
-        /* App background */
         .stApp {{
             background: url(data:image/png;base64,{encoded});
             background-size: cover;
@@ -23,7 +25,6 @@ def set_background(image_path):
             background-attachment: fixed;
         }}
 
-        /* Main container styling */
         .block-container {{
             background-color: rgba(255,255,255,0.97);
             padding: 2rem 3rem;
@@ -33,12 +34,10 @@ def set_background(image_path):
             margin: 2rem auto;
         }}
 
-        /* Text and headers */
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
         }}
 
-        /* Result box */
         .result-box {{
             padding: 1rem;
             border-radius: 10px;
@@ -60,7 +59,10 @@ def set_background(image_path):
             border: 1px solid #f87171;
         }}
 
-        /* Button styling */
+        div.stButton {{
+            padding-top: 2rem !important;
+        }}
+
         div.stButton > button:first-child {{
             background-color: #a1daf8 !important;
             color: white !important;
@@ -72,31 +74,30 @@ def set_background(image_path):
             cursor: pointer !important;
         }}
 
-        div.stButton > button:first-child:hover {{
-            background-color: #7cc7e2 !important;
-        }}
-
-        /* Remove blue backgrounds from slider value labels */
-        div[data-baseweb="slider"] > div > div:nth-child(1),
-        div[data-baseweb="slider"] > div > div:nth-child(3) {{
+        /* Remove default range value blue background */
+        span[data-testid="stTickLabel"] > div {{
             background: none !important;
             color: black !important;
-            font-weight: 500;
         }}
 
-        /* Slider track bar */
+        /* Slider track (the bar) */
         div.stSlider > div[data-baseweb="slider"] > div > div {{
             background: #a1daf8 !important;
             height: 6px;
             border-radius: 6px;
         }}
 
-        /* Slider thumb */
+        /* Slider thumb (circle) */
         div.stSlider > div[data-baseweb="slider"] > div > div > div[role="slider"] {{
             background-color: #a1daf8 !important;
             border: 2px solid #a1daf8 !important;
             width: 16px;
             height: 16px;
+        }}
+
+        /* Slider current value color */
+        div[role="slider"] span {{
+            color: black !important;
         }}
         </style>
         """,
@@ -106,7 +107,7 @@ def set_background(image_path):
 set_background("backgroundimage.jpg")
 
 # -----------------------------
-# Encode features
+# Feature encoding
 # -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
@@ -116,7 +117,7 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
     return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
 
 # -----------------------------
-# UI Layout
+# UI
 # -----------------------------
 st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
@@ -142,7 +143,7 @@ blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
 # -----------------------------
-# Prediction Button & Loader
+# Prediction button and GIF
 # -----------------------------
 submitted = st.button("Check Risk", use_container_width=True)
 gif_placeholder = st.empty()
@@ -175,7 +176,6 @@ if submitted:
 
     gif_placeholder.empty()
 
-    # Show result
     if prediction == 0:
         result_icon = "✅"
         result_text = "No Diabetes Risk Detected"
