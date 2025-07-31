@@ -4,13 +4,7 @@ import numpy as np
 import base64
 import time
 
-# -----------------------------
-# Page configuration
-# -----------------------------
-st.set_page_config(
-    page_title="Diabetes Risk Predictor",
-    layout="centered"
-)
+st.set_page_config(page_title="Diabetes Risk Predictor", layout="centered")
 
 # -----------------------------
 # Background & Custom CSS
@@ -72,12 +66,11 @@ def set_background(image_path):
             background-color: #1565C0 !important;
         }}
 
-        /* Slider track and thumb */
-        [data-baseweb="slider"] > div {{
-            background-color: #a1daf8 !important;
+        /* ✅ Slider Styling */
+        div[data-testid="stSlider"] > div > div {{
+            background: #a1daf8 !important;
         }}
-
-        [data-baseweb="slider"] span[role="slider"] {{
+        div[role="slider"] {{
             background-color: #a1daf8 !important;
             border: 2px solid white !important;
         }}
@@ -124,19 +117,16 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# ✅ Submit Button
+# Button + Placeholder (GIF BELOW the button)
 gif_placeholder = st.empty()
 submitted = st.button("Check Risk", use_container_width=True)
 
-# -----------------------------
-# Prediction + GIF below button
-# -----------------------------
 if submitted:
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <div style="text-align:center; margin-top: 10px;">
+        <div style="text-align:center; margin-top: 1rem;">
             <img src="data:image/gif;base64,{base64_gif}" width="100">
         </div>
         """,
