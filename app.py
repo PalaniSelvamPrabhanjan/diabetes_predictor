@@ -60,17 +60,23 @@ def set_background(image_path):
             font-weight: 600 !important;
             cursor: pointer !important;
         }}
-        div.stButton > button:first-child:hover {{
-            background-color: #7cc7e2 !important;
+        
+        /* Custom slider track */
+        div.stSlider > div[data-baseweb="slider"] > div > div {{
+            background: linear-gradient(to right, #a1daf8 0%, #a1daf8 50%, #D3D3D3 50%, #D3D3D3 100%) !important;
+            height: 6px;
+            border-radius: 10px;
         }}
 
-        div[role="slider"] {{
-            background-color: #a1daf8 !important;  /* Thumb (circle) */
-            border: 2px solid white !important;
+        /* Slider thumb */
+        div.stSlider > div[data-baseweb="slider"] > div > div > div[role="slider"] {{
+            background-color: #a1daf8 !important;
+            border: 2px solid #a1daf8 !important;
+            width: 18px;
+            height: 18px;
+            top: -6px;
         }}
-         div[data-testid="stSlider"] > div > div {{
-            background: linear-gradient(to right, #a1daf8 0%, #a1daf8 100%) !important;  /* Track */
-        }}
+
         </style>
         """,
         unsafe_allow_html=True
