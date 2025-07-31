@@ -1,21 +1,203 @@
+# import streamlit as st
+# import joblib
+# import numpy as np
+# import base64
+# import time
+
+# # -----------------------------
+# # Page configuration
+# # -----------------------------
+# st.set_page_config(
+#     page_title="Diabetes Risk Predictor",
+#     layout="centered"
+# )
+
+# # -----------------------------
+# # Background & Custom CSS
+# # -----------------------------
+# def set_background(image_path):
+#     with open(image_path, "rb") as img:
+#         encoded = base64.b64encode(img.read()).decode()
+#     st.markdown(
+#         f"""
+#         <style>
+#         .stApp {{
+#             background: url(data:image/png;base64,{encoded});
+#             background-size: cover;
+#             background-position: center;
+#             background-attachment: fixed;
+#         }}
+#         .block-container {{
+#             background-color: rgba(255,255,255,0.97);
+#             padding: 2rem 3rem;
+#             border-radius: 12px;
+#             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+#             max-width: 800px;
+#             margin: 2rem auto;
+#         }}
+#         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
+#             color: black !important;
+#         }}
+#         .result-box {{
+#             padding: 1rem;
+#             border-radius: 10px;
+#             font-size: 1.1rem;
+#             margin-top: 0.5rem;
+#             text-align: center;
+#             font-weight: 600;
+#         }}
+#         .green-box {{
+#             background-color: #e6f9ed;
+#             color: #065f46;
+#             border: 1px solid #34d399;
+#         }}
+#         .red-box {{
+#             background-color: #fde8e8;
+#             color: #991b1b;
+#             border: 1px solid #f87171;
+#         }}
+#         div.stButton > button:first-child span {{
+#             color: white !important;
+#         }}
+#         div.stButton > button:first-child {{
+#             background-color: #1E88E5 !important;
+#             border: none !important;
+#             border-radius: 8px !important;
+#             padding: 0.6rem 1rem !important;
+#             font-size: 1rem !important;
+#             font-weight: 600 !important;
+#             cursor: pointer !important;
+#         }}
+#         div.stButton > button:first-child:hover {{
+#             background-color: #1565C0 !important;
+#         }}
+#         .gif-overlay {{
+#             position: fixed;
+#             top: 50%;
+#             left: 50%;
+#             transform: translate(-50%, -50%);
+#             z-index: 9999;
+#         }}
+#         </style>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+# set_background("backgroundimage.jpg")
+
+# # -----------------------------
+# # Encode features
+# # -----------------------------
+# def encode_features(gender, hypertension, heart_disease, smoking_history):
+#     gender_val = 1 if gender == "male" else 0
+#     hypertension_val = 1 if hypertension == "positive" else 0
+#     heart_disease_val = 1 if heart_disease == "positive" else 0
+#     smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
+#     return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
+
+# # -----------------------------
+# # UI
+# # -----------------------------
+# st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+# st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+
+# st.subheader("Demographics")
+# col1, col2 = st.columns(2)
+# with col1:
+#     gender = st.selectbox("Gender", ["male", "female"])
+# with col2:
+#     age = st.slider("Age", 0, 120, 30, 1)
+
+# st.subheader("Medical History")
+# col3, col4 = st.columns(2)
+# with col3:
+#     hypertension = st.selectbox("Hypertension", ["negative", "positive"])
+#     smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
+# with col4:
+#     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
+
+# st.subheader("Health Metrics")
+# bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+# blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+# hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+
+# # ✅ Submit Button
+# submitted = st.button("Check Risk", use_container_width=True)
+
+# # -----------------------------
+# # Prediction + Floating GIF
+# # -----------------------------
+# if submitted:
+#     gif_placeholder = st.empty()
+
+#     # Show centered floating GIF
+#     with open("loadingPage.gif", "rb") as f:
+#         base64_gif = base64.b64encode(f.read()).decode()
+#     gif_placeholder.markdown(
+#         f"""
+#         <div class="gif-overlay">
+#             <img src="data:image/gif;base64,{base64_gif}" width="100">
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+#     start_time = time.time()
+
+#     model = joblib.load("HGBCmodel.pkl")
+#     gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
+#         gender, hypertension, heart_disease, smoking_history
+#     )
+#     input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
+#                             smoking_val, bmi, hba1c_level, blood_glucose]])
+#     prediction = model.predict(input_data)[0]
+
+#     elapsed = time.time() - start_time
+#     if elapsed < 3:
+#         time.sleep(3 - elapsed)
+
+#     gif_placeholder.empty()
+
+#     # Show result
+#     if prediction == 0:
+#         result_icon = "✅"
+#         result_text = "No Diabetes Risk Detected"
+#         explanation = "No signs of diabetes were detected based on the provided information."
+#         box_class = "green-box"
+#     else:
+#         result_icon = "⚠️"
+#         result_text = "Possible Diabetes Risk Detected"
+#         explanation = "Your results suggest a potential risk. Please consult a medical professional."
+#         box_class = "red-box"
+
+#     st.markdown(
+#         f"""
+#         <div class="result-box {box_class}">
+#             {result_icon} <strong>{result_text}</strong><br>
+#             <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
+
+# # -----------------------------
+# # Footer
+# # -----------------------------
+# st.markdown("---")
+# st.markdown("<small>This tool is for rough prediction only. Always consult a medical professional.</small>", unsafe_allow_html=True)
+
+
+
 import streamlit as st
 import joblib
 import numpy as np
 import base64
 import time
 
-# -----------------------------
-# Page configuration
-# -----------------------------
-st.set_page_config(
-    page_title="Diabetes Risk Predictor",
-    layout="centered"
-)
+st.set_page_config(page_title="Diabetes Risk Predictor", layout="centered")
 
-# -----------------------------
-# Background & Custom CSS
-# -----------------------------
-def set_background(image_path):
+# ---------- CSS / Background ----------
+def set_background(image_path: str):
     with open(image_path, "rb") as img:
         encoded = base64.b64encode(img.read()).decode()
     st.markdown(
@@ -34,9 +216,6 @@ def set_background(image_path):
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             max-width: 800px;
             margin: 2rem auto;
-        }}
-        .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
-            color: black !important;
         }}
         .result-box {{
             padding: 1rem;
@@ -85,21 +264,37 @@ def set_background(image_path):
 
 set_background("backgroundimage.jpg")
 
-# -----------------------------
-# Encode features
-# -----------------------------
-def encode_features(gender, hypertension, heart_disease, smoking_history):
+# ---------- Smoking history (display -> internal key) ----------
+DISPLAY_TO_KEY = {
+    "No Info": "NoInfo",
+    "Current": "Current",
+    "Never": "Never",
+    "Former Low Risk": "Former_LowRisk",
+    "Former High Risk": "Former_HighRisk",
+}
+
+# Make sure integers match your training!
+SMOKING_ENCODE = {
+    "NoInfo": 0,
+    "Current": 1,
+    "Never": 2,
+    "Former_LowRisk": 3,
+    "Former_HighRisk": 4,
+}
+
+def encode_features(gender, hypertension, heart_disease, smoking_key):
     gender_val = 1 if gender == "male" else 0
     hypertension_val = 1 if hypertension == "positive" else 0
     heart_disease_val = 1 if heart_disease == "positive" else 0
-    smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
-    return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
+    smoking_val = SMOKING_ENCODE.get(smoking_key, SMOKING_ENCODE["NoInfo"])
+    return gender_val, hypertension_val, heart_disease_val, smoking_val
 
-# -----------------------------
-# UI
-# -----------------------------
+# ---------- UI (Form) ----------
 st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>",
+    unsafe_allow_html=True
+)
 
 st.subheader("Demographics")
 col1, col2 = st.columns(2)
@@ -112,7 +307,11 @@ st.subheader("Medical History")
 col3, col4 = st.columns(2)
 with col3:
     hypertension = st.selectbox("Hypertension", ["negative", "positive"])
-    smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
+    smoking_label = st.selectbox(
+        "Smoking History",
+        list(DISPLAY_TO_KEY.keys())
+    )
+    smoking_key = DISPLAY_TO_KEY[smoking_label]
 with col4:
     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
@@ -121,67 +320,49 @@ bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
 blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
-# ✅ Submit Button
 submitted = st.button("Check Risk", use_container_width=True)
 
-# -----------------------------
-# Prediction + Floating GIF
-# -----------------------------
+# ---------- Predict then go to Results page ----------
 if submitted:
+    # Loading GIF overlay
     gif_placeholder = st.empty()
-
-    # Show centered floating GIF
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
         <div class="gif-overlay">
-            <img src="data:image/gif;base64,{base64_gif}" width="100">
+            <img src="data:image/gif;base64,{base64_gif}" width="100" alt="loading">
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    start_time = time.time()
+    start = time.time()
 
     model = joblib.load("HGBCmodel.pkl")
-    gender_val, hypertension_val, heart_disease_val, smoking_val = encode_features(
-        gender, hypertension, heart_disease, smoking_history
-    )
-    input_data = np.array([[gender_val, age, hypertension_val, heart_disease_val,
-                            smoking_val, bmi, hba1c_level, blood_glucose]])
-    prediction = model.predict(input_data)[0]
+    g, hyp, hd, smk = encode_features(gender, hypertension, heart_disease, smoking_key)
+    x = np.array([[g, age, hyp, hd, smk, bmi, hba1c_level, blood_glucose]])
+    pred = model.predict(x)[0]
 
-    elapsed = time.time() - start_time
+    # keep gif visible at least 3s
+    elapsed = time.time() - start
     if elapsed < 3:
         time.sleep(3 - elapsed)
 
     gif_placeholder.empty()
 
-    # Show result
-    if prediction == 0:
-        result_icon = "✅"
-        result_text = "No Diabetes Risk Detected"
-        explanation = "No signs of diabetes were detected based on the provided information."
-        box_class = "green-box"
-    else:
-        result_icon = "⚠️"
-        result_text = "Possible Diabetes Risk Detected"
-        explanation = "Your results suggest a potential risk. Please consult a medical professional."
-        box_class = "red-box"
+    # Save result to session_state and switch page
+    st.session_state["result_payload"] = {
+        "prediction": int(pred),
+        "inputs": {
+            "gender": gender, "age": age, "hypertension": hypertension,
+            "heart_disease": heart_disease, "smoking_history": smoking_label,
+            "bmi": bmi, "hba1c_level": hba1c_level, "blood_glucose": blood_glucose
+        }
+    }
 
-    st.markdown(
-        f"""
-        <div class="result-box {box_class}">
-            {result_icon} <strong>{result_text}</strong><br>
-            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Requires Streamlit ≥ 1.22
+    st.switch_page("pages/Results.py")
 
-# -----------------------------
-# Footer
-# -----------------------------
 st.markdown("---")
 st.markdown("<small>This tool is for rough prediction only. Always consult a medical professional.</small>", unsafe_allow_html=True)
