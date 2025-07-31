@@ -103,8 +103,8 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
     heart_disease_val = 1 if heart_disease == "positive" else 0
     smoking_map = {
         "Never": 0,
-        "Former Low Risk": 1,
-        "Former High Risk": 2,
+        "Former Light Smoker": 1,
+        "Former Heavy Smoker": 2,
         "Current": 3,
         "No Info": 4
     }
@@ -128,7 +128,7 @@ col3, col4 = st.columns(2)
 with col3:
     hypertension = st.selectbox("Hypertension", ["negative", "positive"])
     smoking_history = st.selectbox("Smoking History", [
-        "No Info", "Never", "Former Low Risk", "Former High Risk", "Current"
+        "No Info", "Never", "Former Light Smoker", "Former Heavy Smoker", "Current"
     ])
 with col4:
     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
