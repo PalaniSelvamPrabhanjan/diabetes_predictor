@@ -128,26 +128,6 @@ def set_background(image_path):
             box-shadow: 0 0 0 0.15rem rgba(161, 218, 248, 0.5) !important;
             color: #003366 !important;
         }}
-
-        /* Override red border on selectbox active/focus state */
-        div[role="combobox"]:focus-within {{
-            border: none !important;
-            box-shadow: 0 0 0 2px #a1daf8 !important;  
-            outline: none !important;
-        }}
-
-        /* Remove red hover ring */
-        div[role="combobox"]:hover {{
-            border: none !important;
-            box-shadow: 0 0 0 2px #a1daf8 !important; 
-        }}
-
-        /* Optional: Inner input field if needed */
-        div[role="combobox"] input:focus {{
-            outline: none !important;
-            box-shadow: none !important;
-            border: none !important;
-        }}
         </style>
         """,
         unsafe_allow_html=True
