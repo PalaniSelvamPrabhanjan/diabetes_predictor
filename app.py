@@ -6,6 +6,11 @@ import time
 
 st.set_page_config(page_title="Diabetes Risk Predictor", layout="centered")
 
+# Load Font Awesome
+st.markdown("""
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+""", unsafe_allow_html=True)
+
 # -----------------------------
 # Background & Custom CSS
 # -----------------------------
@@ -32,6 +37,23 @@ def set_background(image_path):
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
         }}
+        .result-box {{
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            font-weight: 600;
+        }}
+        .green-box {{
+            background-color: #e6f9ed;
+            color: #065f46;
+            border: 1px solid #34d399;
+        }}
+        .red-box {{
+            background-color: #fde8e8;
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }}
         div.stButton > button:first-child {{
             background-color: #a1daf8 !important;
             color: white !important;
@@ -41,65 +63,19 @@ def set_background(image_path):
             font-size: 1rem !important;
             font-weight: 600 !important;
             cursor: pointer !important;
-            margin-top: 2rem;
         }}
-        div.stButton > button:first-child:hover {{
-            background-color: #7cc7e2 !important;
+        div.stButton {{
+            padding-top: 2rem;
         }}
-
-        /* Slider track */
-        div.stSlider > div[data-baseweb="slider"] > div > div {{
-            background-color: #a1daf8 !important;
-        }}
-
-        /* Slider thumb */
-        div.stSlider > div[data-baseweb="slider"] > div > div > div[role="slider"] {{
-            background-color: #a1daf8 !important;
-            border: 2px solid #a1daf8 !important;
-        }}
-
-        /* Remove blue caps above min/max values */
         [data-testid="stTickBar"] {{
             background: none !important;
         }}
-
-        /* Set tick labels to black */
         span[data-testid="stTickLabel"] {{
             color: black !important;
             background: transparent !important;
         }}
-
-        /* Ensure thumb value is black */
         div[role="slider"] > div > span {{
             color: black !important;
-        }}
-
-        .result-box {{
-            padding: 1.5rem;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            text-align: left;
-            font-weight: 500;
-            border: 2px solid;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }}
-
-        .green-box {{
-            background-color: #f0fdf4;
-            color: #15803d;
-            border-color: #4ade80;
-        }}
-        .red-box {{
-            background-color: #fef2f2;
-            color: #b91c1c;
-            border-color: #f87171;
-        }}
-        .disclaimer-box {{
-            background-color: #fffbeb;
-            color: #92400e;
-            border-color: #facc15;
         }}
         </style>
         """,
@@ -115,38 +91,45 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
     hypertension_val = 1 if hypertension == "positive" else 0
     heart_disease_val = 1 if heart_disease == "positive" else 0
-    smoking_map = {"No Info": 0, "Current": 1, "Never": 2, "Past": 3}
+    smoking_map = {
+        "Never": 0,
+        "Former Low Risk": 1,
+        "Former High Risk": 2,
+        "Current": 3,
+        "No Info": 4
+    }
     return gender_val, hypertension_val, heart_disease_val, smoking_map[smoking_history]
 
 # -----------------------------
 # UI
 # -----------------------------
-with st.container():
-    st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
-    st.subheader("Demographics")
-    col1, col2 = st.columns(2)
-    with col1:
-        gender = st.selectbox("Gender", ["male", "female"])
-    with col2:
-        age = st.slider("Age", 0, 120, 30, 1)
+st.subheader("Demographics")
+col1, col2 = st.columns(2)
+with col1:
+    gender = st.selectbox("Gender", ["male", "female"])
+with col2:
+    age = st.slider("Age", 0, 120, 30, 1)
 
-    st.subheader("Medical History")
-    col3, col4 = st.columns(2)
-    with col3:
-        hypertension = st.selectbox("Hypertension", ["negative", "positive"])
-        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
-    with col4:
-        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
+st.subheader("Medical History")
+col3, col4 = st.columns(2)
+with col3:
+    hypertension = st.selectbox("Hypertension", ["negative", "positive"])
+    smoking_history = st.selectbox("Smoking History", [
+        "No Info", "Never", "Former Low Risk", "Former High Risk", "Current"
+    ])
+with col4:
+    heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-    st.subheader("Health Metrics")
-    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
-    blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+st.subheader("Health Metrics")
+bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
 # -----------------------------
-# Button + Loading GIF
+# Submit Button and GIF
 # -----------------------------
 submitted = st.button("Check Risk", use_container_width=True)
 gif_placeholder = st.empty()
@@ -155,11 +138,7 @@ if submitted:
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
-        f"""
-        <div style="text-align:center;">
-            <img src="data:image/gif;base64,{base64_gif}" width="50">
-        </div>
-        """,
+        f"""<div style="text-align:center;"><img src="data:image/gif;base64,{base64_gif}" width="60"></div>""",
         unsafe_allow_html=True
     )
 
@@ -179,35 +158,40 @@ if submitted:
 
     gif_placeholder.empty()
 
-    # Show result
     if prediction == 0:
-        st.markdown(
-            """
+        st.markdown("""
             <div class="result-box green-box">
-                <h3>✅ No Diabetes Risk Detected</h3>
-                <p>❌ No signs of diabetes detected based on the provided information.</p>
+                <i class="fas fa-circle-check"></i> <strong>No Diabetes Risk Detected</strong><br>
+                <span>No signs of diabetes were detected based on the provided information.</span>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
+        """, unsafe_allow_html=True)
     else:
-        st.markdown(
-            """
-            <div class="result-box red-box">
-                <h3>⚠️ Possible Diabetes Risk Detected</h3>
-                <p>❌ Your results suggest a potential risk. Please consult a medical professional.</p>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        notes = ""
+        if blood_glucose > 200:
+            notes += "<li>Blood Glucose Level is high (above 200 mg/dL)</li>"
+        if hba1c_level > 6.5:
+            notes += "<li>HbA1c Level is high (above 6.5%)</li>"
 
-    # Medical disclaimer
-    st.markdown(
-        """
-        <div class="result-box disclaimer-box">
-            <h4>⚠️ Medical Disclaimer</h4>
-            <p>This tool is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.</p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        st.markdown(f"""
+            <div class="result-box red-box">
+                <i class="fas fa-triangle-exclamation"></i> <strong>Possible Diabetes Risk Detected</strong><br>
+                <span>Your results suggest a potential risk. Please consult a medical professional.</span>
+                <ul style='text-align: left; margin-top: 1rem;'>{notes}</ul>
+                <p style='text-align: left; margin-top: 1rem;'><strong>Suggested lifestyle changes:</strong></p>
+                <ul style='text-align: left; margin-bottom: 0;'>
+                    <li>Switch to a diet rich in whole grains, lean proteins and vegetables.</li>
+                    <li>Perform regular exercise.</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+
+# -----------------------------
+# Always-visible Disclaimer
+# -----------------------------
+st.markdown("---")
+st.markdown("""
+    <div class="result-box" style="background-color: #fff9db; border: 1px solid #fcd34d; color: #92400e;">
+        <i class="fas fa-exclamation-circle"></i> <strong>Medical Disclaimer</strong><br>
+        <span>This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.</span>
+    </div>
+""", unsafe_allow_html=True)
