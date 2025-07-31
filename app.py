@@ -104,16 +104,7 @@ def set_background(image_path):
             font-weight: 600;
         }}
 
-        /* Style the number input +/- buttons */
-        button[data-testid="stNumberInputStepDown"],
-        button[data-testid="stNumberInputStepUp"] {{
-            background-color: #a1daf8 !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 4px !important;
-            width: 2rem;
-            height: 2rem;
-        }}
+
 
         /* Icons inside the + and - buttons */
         button[data-testid="stNumberInputStepDown"] svg,
