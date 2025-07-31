@@ -62,11 +62,12 @@ def set_background(image_path):
         .disclaimer-box {{
             background-color: #fef9c3;
             border: 2px solid #facc15;
-            border-radius: 12px;
-            padding: 1.2rem;
-            margin-top: 0.8rem;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
             font-size: 1rem;
             color: #78350f;
+            box-shadow: 0px 1px 4px rgba(0,0,0,0.1);
         }}
         .disclaimer-box i {{
             margin-right: 0.5rem;
@@ -82,7 +83,6 @@ def set_background(image_path):
             cursor: pointer !important;
             margin-top: 1.5rem;
         }}
-        /* Slider tick labels */
         [data-testid="stTickBar"] {{
             background: none !important;
         }}
@@ -166,7 +166,7 @@ if submitted:
 
     if prediction == 0:
         st.markdown(
-            f"""
+            """
             <div class="result-box green-box">
                 <i class="fa-solid fa-circle-check fa-lg"></i> <strong>No Diabetes Risk Detected</strong><br>
                 <span style="font-size: 1rem;">No signs of diabetes detected based on the provided information.</span>
@@ -183,7 +183,7 @@ if submitted:
 
         extra_html = ""
         if extra_messages:
-            extra_html = "<ul style='margin-top: 0.4rem; margin-bottom: 0.4rem; padding-left: 1.2rem;'>"
+            extra_html = "<ul style='margin-top: 0.4rem; margin-bottom: 0.3rem; padding-left: 1.2rem;'>"
             extra_html += ''.join(extra_messages)
             extra_html += "</ul>"
 
@@ -193,11 +193,13 @@ if submitted:
                 <i class="fa-solid fa-triangle-exclamation fa-lg"></i> <strong>Possible Diabetes Risk Detected</strong><br>
                 <span style="font-size: 1rem;">Your results suggest a potential risk. Please consult a medical professional.</span>
                 {extra_html}
-                <strong style="margin-top: 0.5rem; display: inline-block;">Suggested lifestyle changes:</strong>
-                <ul style="margin-top: 0.3rem;">
-                    <li>Switch to a diet rich in whole grains, lean proteins and vegetables.</li>
-                    <li>Perform regular exercise.</li>
-                </ul>
+                <div style="margin-top: 0rem;">
+                    <strong>Suggested lifestyle changes:</strong>
+                    <ul style="margin-top: 0.3rem;">
+                        <li>Switch to a diet rich in whole grains, lean proteins and vegetables.</li>
+                        <li>Perform regular exercise.</li>
+                    </ul>
+                </div>
             </div>
             """,
             unsafe_allow_html=True
@@ -210,8 +212,8 @@ st.markdown(
     """
     <div class="disclaimer-box">
         <i class="fa-solid fa-circle-exclamation fa-lg"></i>
-        <strong>Medical Disclaimer</strong><br>
-        This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.
+        <strong> Medical Disclaimer</strong><br>
+        <span>This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.</span>
     </div>
     """,
     unsafe_allow_html=True
