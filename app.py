@@ -195,7 +195,7 @@ if submitted:
     if prediction == 0:
         st.markdown("""
             <div class="result-box green-box">
-                <i class="fas fa-circle-check"></i> <strong>No Diabetes Risk Detected</strong><br>
+                <i class="fas fa-circle-check"></i> <strong> No Diabetes Risk Detected</strong><br>
                 <span>No signs of diabetes were detected based on the provided information.</span>
             </div>
         """, unsafe_allow_html=True)
@@ -208,7 +208,7 @@ if submitted:
 
         st.markdown(f"""
             <div class="result-box red-box">
-                <i class="fas fa-triangle-exclamation"></i> <strong>Possible Diabetes Risk Detected</strong><br>
+                <i class="fas fa-triangle-exclamation"></i> <strong> Possible Diabetes Risk Detected</strong><br>
                 <span>Your results suggest a potential risk. Please consult a medical professional.</span>
                 <ul style='text-align: left; margin-top: 1rem;'>{notes}</ul>
                 <p class="lifestyle-title"><strong>Suggested lifestyle changes:</strong></p>
@@ -224,7 +224,7 @@ if submitted:
 # -----------------------------
 st.markdown("""
     <div class="disclaimer-box">
-        <i class="fas fa-exclamation-circle"></i> <strong>Medical Disclaimer</strong><br>
+        <i class="fas fa-exclamation-circle"></i> <strong> Medical Disclaimer</strong><br>
         <span>This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.</span>
     </div>
 """, unsafe_allow_html=True)
