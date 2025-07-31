@@ -80,6 +80,13 @@ def set_background(image_path):
         hr + .result-box {{
             margin-top: 0.5rem !important;
         }}
+
+        .lifestyle-title {{
+            text-align: left;
+            margin-top: 1rem;
+            color: #991b1b !important;
+        }}
+
         </style>
         """,
         unsafe_allow_html=True
@@ -180,7 +187,7 @@ if submitted:
                 <i class="fas fa-triangle-exclamation"></i> <strong>Possible Diabetes Risk Detected</strong><br>
                 <span>Your results suggest a potential risk. Please consult a medical professional.</span>
                 <ul style='text-align: left; margin-top: 1rem;'>{notes}</ul>
-                <p style='text-align: left; margin-top: 1rem; color: #991b1b;'><strong>Suggested lifestyle changes:</strong></p>
+                <p class="lifestyle-title"><strong>Suggested lifestyle changes:</strong></p>
                 <ul style='text-align: left; margin-bottom: 0;'>
                     <li>Switch to a diet rich in whole grains, lean proteins and vegetables.</li>
                     <li>Perform regular exercise.</li>
