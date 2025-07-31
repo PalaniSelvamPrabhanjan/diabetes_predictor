@@ -1,2 +1,3 @@
 [theme]
-base = "dark"
+secondaryBackgroundColor = "#0a0a0a"
+primaryColor = "#a1daf8"
