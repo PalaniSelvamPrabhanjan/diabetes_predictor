@@ -129,12 +129,24 @@ def set_background(image_path):
             color: #003366 !important;
         }}
 
-        /* drop down design border on active */
-        /* Dropdown (selectbox) arrow on hover */
-        div[role="combobox"]:hover,
-        div[role="combobox"]:active {{
+        /* Override red border on selectbox active/focus state */
+        div[role="combobox"]:focus-within {{
             border: none !important;
+            box-shadow: 0 0 0 2px #a1daf8 !important;  
+            outline: none !important;
+        }}
+
+        /* Remove red hover ring */
+        div[role="combobox"]:hover {{
+            border: none !important;
+            box-shadow: 0 0 0 2px #a1daf8 !important; 
+        }}
+
+        /* Optional: Inner input field if needed */
+        div[role="combobox"] input:focus {{
+            outline: none !important;
             box-shadow: none !important;
+            border: none !important;
         }}
         </style>
         """,
