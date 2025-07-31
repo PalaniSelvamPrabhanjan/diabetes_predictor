@@ -187,8 +187,8 @@ if submitted:
     prediction = model.predict(input_data)[0]
 
     elapsed = time.time() - start_time
-    if elapsed < 3:
-        time.sleep(3 - elapsed)
+    if elapsed < 40:
+        time.sleep(40 - elapsed)
 
     gif_placeholder.empty()
 
