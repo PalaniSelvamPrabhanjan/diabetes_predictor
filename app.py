@@ -123,7 +123,8 @@ def set_background(image_path):
         }}
 
         /* Highlight selected number input value */
-        input[type="number"]:focus {{
+        input[type="number"]:focus,
+        input[type="number"]:active {{
             border-color: #a1daf8 !important;
             box-shadow: 0 0 0 0.15rem rgba(161, 218, 248, 0.5) !important;
             color: #003366 !important;
