@@ -4,9 +4,6 @@ import numpy as np
 import base64
 import time
 
-# -----------------------------
-# Page configuration
-# -----------------------------
 st.set_page_config(page_title="Diabetes Risk Predictor", layout="centered")
 
 # -----------------------------
@@ -24,7 +21,6 @@ def set_background(image_path):
             background-position: center;
             background-attachment: fixed;
         }}
-
         .block-container {{
             background-color: rgba(255,255,255,0.97);
             padding: 2rem 3rem;
@@ -33,36 +29,9 @@ def set_background(image_path):
             max-width: 800px;
             margin: 2rem auto;
         }}
-
         .stMarkdown, label, p, h1, h2, h3, h4, h5, h6 {{
             color: black !important;
         }}
-
-        .result-box {{
-            padding: 1rem;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-            text-align: center;
-            font-weight: 600;
-        }}
-
-        .green-box {{
-            background-color: #e6f9ed;
-            color: #065f46;
-            border: 1px solid #34d399;
-        }}
-
-        .red-box {{
-            background-color: #fde8e8;
-            color: #991b1b;
-            border: 1px solid #f87171;
-        }}
-
-        div.stButton {{
-            padding-top: 2rem !important;
-        }}
-
         div.stButton > button:first-child {{
             background-color: #a1daf8 !important;
             color: white !important;
@@ -72,32 +41,65 @@ def set_background(image_path):
             font-size: 1rem !important;
             font-weight: 600 !important;
             cursor: pointer !important;
+            margin-top: 2rem;
+        }}
+        div.stButton > button:first-child:hover {{
+            background-color: #7cc7e2 !important;
         }}
 
-        /* Remove default range value blue background */
-        span[data-testid="stTickLabel"] > div {{
-            background: none !important;
-            color: black !important;
-        }}
-
-        /* Slider track (the bar) */
+        /* Slider track */
         div.stSlider > div[data-baseweb="slider"] > div > div {{
-            background: #a1daf8 !important;
-            height: 6px;
-            border-radius: 6px;
+            background-color: #a1daf8 !important;
         }}
 
-        /* Slider thumb (circle) */
+        /* Slider thumb */
         div.stSlider > div[data-baseweb="slider"] > div > div > div[role="slider"] {{
             background-color: #a1daf8 !important;
             border: 2px solid #a1daf8 !important;
-            width: 16px;
-            height: 16px;
         }}
 
-        /* Slider current value color */
-        div[role="slider"] span {{
+        /* Remove blue caps above min/max values */
+        [data-testid="stTickBar"] {{
+            background: none !important;
+        }}
+
+        /* Set tick labels to black */
+        span[data-testid="stTickLabel"] {{
             color: black !important;
+            background: transparent !important;
+        }}
+
+        /* Ensure thumb value is black */
+        div[role="slider"] > div > span {{
+            color: black !important;
+        }}
+
+        .result-box {{
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            font-weight: 500;
+            border: 2px solid;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }}
+
+        .green-box {{
+            background-color: #f0fdf4;
+            color: #15803d;
+            border-color: #4ade80;
+        }}
+        .red-box {{
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #f87171;
+        }}
+        .disclaimer-box {{
+            background-color: #fffbeb;
+            color: #92400e;
+            border-color: #facc15;
         }}
         </style>
         """,
@@ -107,7 +109,7 @@ def set_background(image_path):
 set_background("backgroundimage.jpg")
 
 # -----------------------------
-# Feature encoding
+# Encode features
 # -----------------------------
 def encode_features(gender, hypertension, heart_disease, smoking_history):
     gender_val = 1 if gender == "male" else 0
@@ -119,31 +121,32 @@ def encode_features(gender, hypertension, heart_disease, smoking_history):
 # -----------------------------
 # UI
 # -----------------------------
-st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
+with st.container():
+    st.markdown("<h1 style='text-align:center;'>Diabetes Risk Predictor</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center;'>Estimate your diabetes risk based on health indicators.<br><b>This is not medical advice.</b></p>", unsafe_allow_html=True)
 
-st.subheader("Demographics")
-col1, col2 = st.columns(2)
-with col1:
-    gender = st.selectbox("Gender", ["male", "female"])
-with col2:
-    age = st.slider("Age", 0, 120, 30, 1)
+    st.subheader("Demographics")
+    col1, col2 = st.columns(2)
+    with col1:
+        gender = st.selectbox("Gender", ["male", "female"])
+    with col2:
+        age = st.slider("Age", 0, 120, 30, 1)
 
-st.subheader("Medical History")
-col3, col4 = st.columns(2)
-with col3:
-    hypertension = st.selectbox("Hypertension", ["negative", "positive"])
-    smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
-with col4:
-    heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
+    st.subheader("Medical History")
+    col3, col4 = st.columns(2)
+    with col3:
+        hypertension = st.selectbox("Hypertension", ["negative", "positive"])
+        smoking_history = st.selectbox("Smoking History", ["No Info", "Current", "Never", "Past"])
+    with col4:
+        heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
-st.subheader("Health Metrics")
-bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
-blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+    st.subheader("Health Metrics")
+    bmi = st.slider("BMI (Body Mass Index)", 10.0, 50.0, 25.0, 0.1)
+    blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+    hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
 # -----------------------------
-# Prediction button and GIF
+# Button + Loading GIF
 # -----------------------------
 submitted = st.button("Check Risk", use_container_width=True)
 gif_placeholder = st.empty()
@@ -154,7 +157,7 @@ if submitted:
     gif_placeholder.markdown(
         f"""
         <div style="text-align:center;">
-            <img src="data:image/gif;base64,{base64_gif}" width="60">
+            <img src="data:image/gif;base64,{base64_gif}" width="50">
         </div>
         """,
         unsafe_allow_html=True
@@ -176,29 +179,35 @@ if submitted:
 
     gif_placeholder.empty()
 
+    # Show result
     if prediction == 0:
-        result_icon = "✅"
-        result_text = "No Diabetes Risk Detected"
-        explanation = "No signs of diabetes were detected based on the provided information."
-        box_class = "green-box"
+        st.markdown(
+            """
+            <div class="result-box green-box">
+                <h3>✅ No Diabetes Risk Detected</h3>
+                <p>❌ No signs of diabetes detected based on the provided information.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     else:
-        result_icon = "⚠️"
-        result_text = "Possible Diabetes Risk Detected"
-        explanation = "Your results suggest a potential risk. Please consult a medical professional."
-        box_class = "red-box"
+        st.markdown(
+            """
+            <div class="result-box red-box">
+                <h3>⚠️ Possible Diabetes Risk Detected</h3>
+                <p>❌ Your results suggest a potential risk. Please consult a medical professional.</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
+    # Medical disclaimer
     st.markdown(
-        f"""
-        <div class="result-box {box_class}">
-            {result_icon} <strong>{result_text}</strong><br>
-            <span style="font-size:0.9rem; font-weight:400;">{explanation}</span>
+        """
+        <div class="result-box disclaimer-box">
+            <h4>⚠️ Medical Disclaimer</h4>
+            <p>This tool is for educational purposes only and should not replace professional medical advice. Always consult with a healthcare provider for accurate diagnosis and treatment.</p>
         </div>
         """,
         unsafe_allow_html=True
     )
-
-# -----------------------------
-# Footer
-# -----------------------------
-st.markdown("---")
-st.markdown("<small>This tool is for rough prediction only. Always consult a medical professional.</small>", unsafe_allow_html=True)
