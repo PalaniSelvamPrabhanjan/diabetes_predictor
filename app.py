@@ -104,7 +104,11 @@ def set_background(image_path):
             font-weight: 600;
         }}
 
-
+        /* Hover effect */
+        button[data-testid="stNumberInputStepDown"]:hover,
+        button[data-testid="stNumberInputStepUp"]:hover {{
+            background-color: #7ccbeb !important;
+        }}
 
         /* Icons inside the + and - buttons */
         button[data-testid="stNumberInputStepDown"] svg,
@@ -116,7 +120,7 @@ def set_background(image_path):
         input[type="number"]:focus {{
             border-color: #a1daf8 !important;
             box-shadow: 0 0 0 0.15rem rgba(161, 218, 248, 0.5) !important;
-            color: #a1daf8 !important;
+            color: #003366 !important;
         }}
         </style>
         """,
