@@ -77,16 +77,21 @@ def set_background(image_path):
         div[role="slider"] > div > span {{
             color: black !important;
         }}
-        hr + .result-box {{
-            margin-top: 0.5rem !important;
-        }}
-
         .lifestyle-title {{
             text-align: left;
             margin-top: 1rem;
             color: #991b1b !important;
         }}
-
+        .disclaimer-box {{
+            background-color: #fff9db;
+            margin-top: 0.5rem;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -199,7 +204,7 @@ if submitted:
 # Always-visible Disclaimer
 # -----------------------------
 st.markdown("""
-    <div class="result-box" style="background-color: #fff9db; margin-top: 1rem; border: 1px solid #fcd34d; color: #92400e;">
+    <div class="disclaimer-box">
         <i class="fas fa-exclamation-circle"></i> <strong>Medical Disclaimer</strong><br>
         <span>This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.</span>
     </div>
