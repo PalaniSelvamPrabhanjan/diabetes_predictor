@@ -110,6 +110,12 @@ def set_background(image_path):
             background-color: #7ccbeb !important;
         }}
 
+        /* Hover effect */
+        button[data-testid="stNumberInputStepDown"]:active,
+        button[data-testid="stNumberInputStepUp"]:active {{
+            background-color: #7ccbeb !important;
+        }}
+
         /* Icons inside the + and - buttons */
         button[data-testid="stNumberInputStepDown"] svg,
         button[data-testid="stNumberInputStepUp"] svg {{
@@ -121,6 +127,13 @@ def set_background(image_path):
             border-color: #a1daf8 !important;
             box-shadow: 0 0 0 0.15rem rgba(161, 218, 248, 0.5) !important;
             color: #003366 !important;
+        }}
+
+        /* drop down design border on active */
+        /* Dropdown (selectbox) arrow on hover */
+        div[role="combobox"]:hover {{
+            border: none !important;
+            box-shadow: none !important;
         }}
         </style>
         """,
