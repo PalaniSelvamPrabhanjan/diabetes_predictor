@@ -56,6 +56,9 @@ def set_background(image_path):
             color: #991b1b;
             border: 1px solid #f87171;
         }}
+        div.stButton > button:first-child span {{
+            color: white !important;
+        }}
         div.stButton > button:first-child {{
             background-color: #a1daf8 !important;
             border: none !important;
@@ -68,15 +71,15 @@ def set_background(image_path):
         div.stButton > button:first-child:hover {{
             background-color: #1565C0 !important;
         }}
-        div.stButton > button:first-child span {{
-            color: white !important;
+
+        /* Slider track and thumb */
+        [data-baseweb="slider"] > div {{
+            background-color: #a1daf8 !important;
         }}
-        .gif-overlay {{
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
+
+        [data-baseweb="slider"] span[role="slider"] {{
+            background-color: #a1daf8 !important;
+            border: 2px solid white !important;
         }}
         </style>
         """,
@@ -122,20 +125,18 @@ blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
 hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
 
 # ✅ Submit Button
+gif_placeholder = st.empty()
 submitted = st.button("Check Risk", use_container_width=True)
 
 # -----------------------------
-# Prediction + Floating GIF
+# Prediction + GIF below button
 # -----------------------------
 if submitted:
-    gif_placeholder = st.empty()
-
-    # Show centered floating GIF
     with open("loadingPage.gif", "rb") as f:
         base64_gif = base64.b64encode(f.read()).decode()
     gif_placeholder.markdown(
         f"""
-        <div class="gif-overlay">
+        <div style="text-align:center; margin-top: 10px;">
             <img src="data:image/gif;base64,{base64_gif}" width="100">
         </div>
         """,
