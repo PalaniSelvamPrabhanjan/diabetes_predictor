@@ -63,7 +63,7 @@ def set_background(image_path):
 
         /* Custom slider track */
         div.stSlider > div[data-baseweb="slider"] > div > div {{
-            background: linear-gradient(to right, #a1daf8 0%, #a1daf8 50%, #D3D3D3 50%, #D3D3D3 100%) !important;
+            background-color: #a1daf8 !important;
         }}
 
         /* Slider thumb */
