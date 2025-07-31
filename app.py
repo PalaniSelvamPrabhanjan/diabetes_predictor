@@ -52,18 +52,19 @@ def set_background(image_path):
             border: 2px solid #f87171;
         }}
         .result-box ul {{
-            margin-top: 0.4rem;
+            margin-top: 0.3rem;
+            margin-bottom: 0.5rem;
             padding-left: 1.2rem;
         }}
         .result-box li {{
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.25rem;
         }}
         .disclaimer-box {{
             background-color: #fef9c3;
             border: 2px solid #facc15;
             border-radius: 12px;
             padding: 1.2rem;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             font-size: 1rem;
             color: #78350f;
         }}
@@ -80,6 +81,17 @@ def set_background(image_path):
             font-weight: 600 !important;
             cursor: pointer !important;
             margin-top: 1.5rem;
+        }}
+        /* Slider tick labels */
+        [data-testid="stTickBar"] {{
+            background: none !important;
+        }}
+        span[data-testid="stTickLabel"] {{
+            color: black !important;
+            background: transparent !important;
+        }}
+        div[role="slider"] > div > span {{
+            color: black !important;
         }}
         </style>
         """,
@@ -157,7 +169,7 @@ if submitted:
             f"""
             <div class="result-box green-box">
                 <i class="fa-solid fa-circle-check fa-lg"></i> <strong>No Diabetes Risk Detected</strong><br>
-                <span>No signs of diabetes detected based on the provided information.</span>
+                <span style="font-size: 1rem;">No signs of diabetes detected based on the provided information.</span>
             </div>
             """,
             unsafe_allow_html=True
@@ -169,7 +181,11 @@ if submitted:
         if hba1c_level > 6.5:
             extra_messages.append("<li>HbA1c Level is high (above 6.5%)</li>")
 
-        extra_html = f"<ul>{''.join(extra_messages)}</ul>" if extra_messages else ""
+        extra_html = ""
+        if extra_messages:
+            extra_html = "<ul style='margin-top: 0.4rem; margin-bottom: 0.4rem; padding-left: 1.2rem;'>"
+            extra_html += ''.join(extra_messages)
+            extra_html += "</ul>"
 
         st.markdown(
             f"""
@@ -177,8 +193,8 @@ if submitted:
                 <i class="fa-solid fa-triangle-exclamation fa-lg"></i> <strong>Possible Diabetes Risk Detected</strong><br>
                 <span style="font-size: 1rem;">Your results suggest a potential risk. Please consult a medical professional.</span>
                 {extra_html}
-                <br><strong>Suggested lifestyle changes:</strong>
-                <ul>
+                <strong style="margin-top: 0.5rem; display: inline-block;">Suggested lifestyle changes:</strong>
+                <ul style="margin-top: 0.3rem;">
                     <li>Switch to a diet rich in whole grains, lean proteins and vegetables.</li>
                     <li>Perform regular exercise.</li>
                 </ul>
