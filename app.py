@@ -69,6 +69,9 @@ def set_background(image_path):
             border: 2px solid white !important;
         }}
         </style>
+        div[data-testid="stSlider"] > div > div {{
+            background: linear-gradient(to right, #a1daf8 0%, #a1daf8 100%) !important;  /* Track */
+        }}
         """,
         unsafe_allow_html=True
     )
@@ -123,7 +126,7 @@ if submitted:
     gif_placeholder.markdown(
         f"""
         <div style="text-align:center;">
-            <img src="data:image/gif;base64,{base64_gif}" width="100">
+            <img src="data:image/gif;base64,{base64_gif}" width="60">
         </div>
         """,
         unsafe_allow_html=True
