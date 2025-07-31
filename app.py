@@ -191,7 +191,6 @@ if submitted:
 # -----------------------------
 # Always-visible Disclaimer
 # -----------------------------
-st.markdown("---")
 st.markdown("""
     <div class="result-box" style="background-color: #fff9db; border: 1px solid #fcd34d; color: #92400e;">
         <i class="fas fa-exclamation-circle"></i> <strong>Medical Disclaimer</strong><br>
