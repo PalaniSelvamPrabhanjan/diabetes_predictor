@@ -192,7 +192,7 @@ if submitted:
 # Always-visible Disclaimer
 # -----------------------------
 st.markdown("""
-    <div class="result-box" style="background-color: #fff9db; border: 1px solid #fcd34d; color: #92400e;">
+    <div class="result-box" style="background-color: #fff9db; margin-top: 1rem; border: 1px solid #fcd34d; color: #92400e;">
         <i class="fas fa-exclamation-circle"></i> <strong>Medical Disclaimer</strong><br>
         <span>This tool is for rough prediction only. Always consult a medical professional for a confirmed diagnosis.</span>
     </div>
