@@ -150,6 +150,9 @@ with col4:
     heart_disease = st.selectbox("Heart Disease", ["negative", "positive"])
 
 st.subheader("Health Metrics")
+blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
+hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+
 col5, col6 = st.columns(2)
 with col5:
     height_cm = st.number_input("Height (cm)", min_value=100, max_value=250, value=170)
@@ -157,10 +160,7 @@ with col6:
     weight_kg = st.number_input("Weight (kg)", min_value=30, max_value=250, value=70)
 height_m = height_cm / 100
 bmi = round(weight_kg / (height_m ** 2), 2)
-st.markdown(f"<p><strong>Calculated BMI:</strong> {bmi}</p>", unsafe_allow_html=True)
-
-blood_glucose = st.slider("Blood Glucose Level (mg/dL)", 50, 300, 100, 1)
-hba1c_level = st.slider("HbA1c Level (%) *", 3.0, 15.0, 5.5, 0.1)
+st.markdown(f"<p>Calculated BMI: {bmi}</p>", unsafe_allow_html=True)
 
 # -----------------------------
 # Submit Button and GIF
