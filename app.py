@@ -56,11 +56,8 @@ def set_background(image_path):
             color: #991b1b;
             border: 1px solid #f87171;
         }}
-        div.stButton > button:first-child span {{
-            color: white !important;
-        }}
         div.stButton > button:first-child {{
-            background-color: #1E88E5 !important;
+            background-color: #a1daf8 !important;
             border: none !important;
             border-radius: 8px !important;
             padding: 0.6rem 1rem !important;
@@ -70,6 +67,9 @@ def set_background(image_path):
         }}
         div.stButton > button:first-child:hover {{
             background-color: #1565C0 !important;
+        }}
+        div.stButton > button:first-child span {{
+            color: white !important;
         }}
         .gif-overlay {{
             position: fixed;
