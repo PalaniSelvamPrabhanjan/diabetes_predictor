@@ -75,7 +75,7 @@ def set_background(image_path):
         }}
         [data-testid="stSliderTickBarMin"],
         [data-testid="stSliderTickBarMax"] {{
-            color: #a1daf8 !important;
+            color: #003366 !important;
             font-weight: 600;
         }}
         div[data-baseweb="slider"] .st-cv {{
@@ -86,7 +86,7 @@ def set_background(image_path):
             border: 2px solid #6cc3dd !important;
         }}
         div[data-testid="stSliderThumbValue"] {{
-            color: #a1daf8 !important;
+            color: #003366 !important;
         }}
         .lifestyle-title {{
             text-align: left;
