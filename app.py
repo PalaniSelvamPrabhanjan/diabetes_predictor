@@ -103,6 +103,30 @@ def set_background(image_path):
             font-size: 1.05rem;
             font-weight: 600;
         }}
+
+        /* Style the number input +/- buttons */
+        button[data-testid="stNumberInputStepDown"],
+        button[data-testid="stNumberInputStepUp"] {{
+            background-color: #a1daf8 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            width: 2rem;
+            height: 2rem;
+        }}
+
+        /* Icons inside the + and - buttons */
+        button[data-testid="stNumberInputStepDown"] svg,
+        button[data-testid="stNumberInputStepUp"] svg {{
+            fill: white !important;
+        }}
+
+        /* Highlight selected number input value */
+        input[type="number"]:focus {{
+            border-color: #a1daf8 !important;
+            box-shadow: 0 0 0 0.15rem rgba(161, 218, 248, 0.5) !important;
+            color: #003366 !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True
