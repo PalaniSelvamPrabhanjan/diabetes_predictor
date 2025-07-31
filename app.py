@@ -59,7 +59,7 @@ def set_background(image_path):
             color: white !important;
             border: none !important;
             border-radius: 8px !important;
-            padding: 0.6rem 1rem !important;
+            padding: 0.6rem 0.7rem !important;
             font-size: 1rem !important;
             font-weight: 600 !important;
             cursor: pointer !important;
